@@ -6,7 +6,7 @@ import genToken from "../utils/token.js"
 export const signUp = async (req, res) => {
     try {
         const { fullName, email, password, mobile, role } = req.body
-        const user = await User.findOne({ email })
+        let user = await User.findOne({ email })
         if (user) {
             return res.status(400).json({ message: "User Already Exist." })
         }
