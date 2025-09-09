@@ -17,22 +17,17 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 
-// Routes
+// Routes 
 app.use("/api/auth", authRouter)
 
-// Start server
-const startServer = async () => {
+// Server start
+app.listen(port, async () => {
     try {
-        await connectDb(); // yahan DB ka console handle hoga
-
-        app.listen(port, () => {
-            console.log(`Server started at port ${port}`);
-        });
-    } catch (error) {
-        console.error("Server not started because DB connection failed");
-        process.exit(1);
+        await connectDb();
+        console.log(`✅ Server started at port ${port}`);
+    } catch (err) {
+        console.error("❌ DB Connection Error:", err);
     }
-};
+})
 
-startServer();
 
