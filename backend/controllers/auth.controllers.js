@@ -1,75 +1,87 @@
-import User from '../models/user.model.js'
-import bcrypt from 'bcryptjs'
-import genToken from "../utils/token.js"
+import bcrypt from "bcryptjs";
+import User from "../models/user.model.js";
+import genToken from "../utils/token.js";
 
-// signUp controller
+//signup controller
 export const signUp = async (req, res) => {
     try {
-        const { fullName, email, password, mobile, role } = req.body
-        let user = await User.findOne({ email })
+        const { fullName, email, password, mobile, role } = req.body;
+        // Check if user exists
+        let user = await User.findOne({ email });
         if (user) {
-            return res.status(400).json({ message: "User Already Exist." })
-        }
-        if (password.lenght > 6) {
-            return res.status(400).json({ message: "password must be at least 6 characters." })
-        }
-        if (mobile.lenght > 10) {
-            return res.status(400).json({ message: "mobile number must be at least 10 digits." })
+            return res.status(400).json({ message: "User already exists." });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10)
+        // Validation
+        if (password.length < 6) {
+            return res.status(400).json({ message: "Password must be at least 6 characters." });
+        }
+        if (mobile.length !== 10) {
+            return res.status(400).json({ message: "Mobile number must be exactly 10 digits." });
+        }
 
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create user
         user = await User.create({
             fullName,
             email,
             mobile,
             role,
-            password: hashedPassword
+            password: hashedPassword,
+        });
 
-        })
-
-        const token = await genToken(user._id)
+        // Generate token & set cookie
+        const token = await genToken(user._id);
         res.cookie("token", token, {
             secure: false,
             sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            httpOnly: true
-        })
+            httpOnly: true,
+        });
 
-        return res.status(201).json(user)
+        return res.status(201).json(user);
     } catch (error) {
-        return res.status(500).json(`sign up error ${error}`)
+        console.error("Signup error:", error);
+        return res.status(500).json({
+            message: "Signup failed",
+            error: error.message,
+        });
     }
-}
+};
+
 
 // signIn controller
 export const signIn = async (req, res) => {
     try {
-        const { email, password } = req.body
-        const user = await User.findOne({ email })
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: "User doesn't  exist." })
+            return res.status(400).json({ message: "User doesn't exist." });
         }
 
-        const isMatchedPassword = await bcrypt.compare(password, user.password)
-        if (isMatchedPassword) {
-            return res.status(400).json({ message: "incorrect password" })
+        const isMatchedPassword = await bcrypt.compare(password, user.password);
+        if (!isMatchedPassword) {
+            return res.status(400).json({ message: "Incorrect password" });
         }
 
-
-        const token = await genToken(user._id)
+        const token = await genToken(user._id);
         res.cookie("token", token, {
             secure: false,
-            sameSite: "strict",
+            sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            httpOnly: true
-        })
+            httpOnly: true,
+        });
 
-        return res.status(200).json(user)
+        const { password: _, ...userData } = user._doc;
+        return res.status(200).json(userData);
     } catch (error) {
-        return res.status(500).json(`sign In error ${error}`)
+        console.error("signIn error:", error);
+        return res.status(500).json({ message: "Sign In failed", error: error.message });
     }
-}
+};
+
 
 // logout controller
 export const logOut = async (req, res) => {
