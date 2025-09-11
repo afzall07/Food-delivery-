@@ -24,7 +24,7 @@ const userSchema = mongoose.Schema({
     resetOtp: {
         type: String,
     },
-    isOtpVarified: {
+    isOtpVerified: {
         type: Boolean,
         default: false
     },
