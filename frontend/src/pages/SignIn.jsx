@@ -33,22 +33,13 @@ function SignIn() {
         return;
       }
       // Email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!email.trim()) {
         setEmailError("⚠️ Email is required");
         return;
-      } else if (!emailRegex.test(email.trim())) {
-        setEmailError("⚠️ Enter a valid email address");
-        return;
       }
       // Password validation
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
       if (!password.trim()) {
         setPasswordError("⚠️ Password is required");
-        return;
-      } else if (!passwordRegex.test(password)) {
-        setPasswordError("⚠️ Incorrect password");
         return;
       }
       // API call
