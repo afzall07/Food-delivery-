@@ -15,33 +15,12 @@ function SignIn() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [signUpError, setSignInError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [error, setError] = useState("");
 
   // handleSignUp
   const handleSignIn = async () => {
     // Validation
     try {
-      // clear old errors
-      setSignInError("");
-      setEmailError("");
-      setPasswordError("");
-      // all fields empty
-      if (!email && !password) {
-        setSignInError("⚠️ All fields are required");
-        return;
-      }
-      // Email validation
-      if (!email.trim()) {
-        setEmailError("⚠️ Email is required");
-        return;
-      }
-      // Password validation
-      if (!password.trim()) {
-        setPasswordError("⚠️ Password is required");
-        return;
-      }
       // API call
       const result = await axios.post(
         "http://localhost:7000/api/auth/signin",
@@ -55,7 +34,7 @@ function SignIn() {
       console.log(result.data);
     } catch (error) {
       console.error("Signin error:", error);
-      setSignInError(error.response?.data?.message || "Signin failed");
+      setError(error.response?.data?.message || "Signin failed");
     }
   };
 
@@ -94,11 +73,11 @@ function SignIn() {
             style={{ border: `1px solid ${borderColor}` }}
             onChange={(e) => {
               setEmail(e.target.value);
-              setEmailError("");
+              setError("");
             }}
             value={email}
           />
-          <span className="email-error  text-red-600">{emailError}</span>
+          {/* <span className="error  text-red-600">{error}</span> */}
         </div>
 
         {/* password */}
@@ -118,13 +97,11 @@ function SignIn() {
               style={{ border: `1px solid ${borderColor}` }}
               onChange={(e) => {
                 setPassword(e.target.value);
-                setPasswordError("");
+                setError("");
               }}
               value={password}
             />
-            <span className="password-error  text-red-600">
-              {passwordError}
-            </span>
+            <span className="error  text-red-600">{error}</span>
             <button
               className="absolute right-3 top-[14px] text-gray-500 cursor-pointer"
               onClick={() => setShowPassword((prev) => !prev)}
@@ -132,12 +109,15 @@ function SignIn() {
               {!showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
             </button>
           </div>
+          {/* <span className="error  text-red-600">{error}</span> */}
         </div>
-        <div
-          className="text-right cursor-pointer mb-4 text-[#ff4d2d] font-medium"
-          onClick={() => navigate("/forgot-password")}
-        >
-          Forgot Password?
+        <div className="text-right mb-4">
+          <button
+            className="cursor-pointer  text-[#ff4d2d] font-medium"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forgot Password?
+          </button>
         </div>
         <button
           className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
@@ -145,7 +125,7 @@ function SignIn() {
         >
           Sign In
         </button>
-        <p className="signup-error text-red-600 text-center">{signUpError}</p>
+
         <div className="text-center mt-2 " style={{ fontSize: "13px" }}>
           ----------------------------- OR ------------------------------
         </div>
