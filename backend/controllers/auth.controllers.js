@@ -153,23 +153,32 @@ export const resetPassword = async (req, res) => {
 // google auth controller
 export const googleAuth = async (req, res) => {
     try {
-        const { fullName, email, mobile, role } = req.body
-        let user = await User.findOne({ email })
+        const { email, fullName, mobile, role } = req.body;
+
+        let user = await User.findOne({ email });
+
         if (!user) {
-            user = await User.create({
-                fullName, email, mobile, role
-            })
+            // Agar signup fields nahi diye to error return karo
+            if (!fullName || !mobile || !role) {
+                return res
+                    .status(400)
+                    .json({ message: "User not found, please sign up first." });
+            }
+
+            // Agar fields diye gaye hain to new user create karo
+            user = await User.create({ fullName, email, mobile, role });
         }
 
-        const token = await genToken(user._id)
+        const token = await genToken(user._id);
         res.cookie("token", token, {
             secure: false,
             sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             httpOnly: true,
-        })
-        return res.status(200).json(user)
+        });
+
+        return res.status(200).json(user);
     } catch (error) {
-        return res.status(500).json(`googleAuth error ${error}`)
+        return res.status(500).json({ message: `googleAuth error: ${error}` });
     }
-}
+};
