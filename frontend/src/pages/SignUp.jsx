@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { Profiler, useState } from "react";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from "../images/bg-removed-logo.png";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../../firbase";
+import { ClipLoader } from "react-spinners";
 
 function SignUp() {
   const primaryColor = "#ff4d2d";
@@ -23,57 +26,57 @@ function SignUp() {
   const [emailError, setEmailError] = useState("");
   const [mobileError, setMobileError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-
+  const [loading, setLoading] = useState(false);
   // handleSignUp
   const handleSignUp = async () => {
-    // Validation
+    // clear old errors
+    setSignUpError("");
+    setFullNameError("");
+    setEmailError("");
+    setMobileError("");
+    setPasswordError("");
+    // all fields empty
+    if (!fullName && !email && !mobile && !password) {
+      setSignUpError("⚠️ All fields are required");
+      return;
+    }
+    // Name validation
+    if (!fullName.trim()) {
+      setFullNameError("⚠️ Full name is required");
+      return;
+    }
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      setEmailError("⚠️ Email is required");
+      return;
+    } else if (!emailRegex.test(email.trim())) {
+      setEmailError("⚠️ Enter a valid email address");
+      return;
+    }
+    // Mobile validation
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!mobile.trim()) {
+      setMobileError("⚠️ Mobile number is required");
+      return;
+    } else if (!mobileRegex.test(mobile.trim())) {
+      setMobileError("⚠️ Mobile number must be exactly 10 digits");
+      return;
+    }
+    // Password validation
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+    if (!password.trim()) {
+      setPasswordError("⚠️ Password is required");
+      return;
+    } else if (!passwordRegex.test(password)) {
+      setPasswordError(
+        "⚠️ Password must have 6+ chars, include uppercase, lowercase, number & symbol"
+      );
+      return;
+    }
+    setLoading(true);
     try {
-      // clear old errors
-      setSignUpError("");
-      setFullNameError("");
-      setEmailError("");
-      setMobileError("");
-      setPasswordError("");
-      // all fields empty
-      if (!fullName && !email && !mobile && !password) {
-        setSignUpError("⚠️ All fields are required");
-        return;
-      }
-      // Name validation
-      if (!fullName.trim()) {
-        setFullNameError("⚠️ Full name is required");
-        return;
-      }
-      // Email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!email.trim()) {
-        setEmailError("⚠️ Email is required");
-        return;
-      } else if (!emailRegex.test(email.trim())) {
-        setEmailError("⚠️ Enter a valid email address");
-        return;
-      }
-      // MObile validation
-      const mobileRegex = /^[0-9]{10}$/;
-      if (!mobile.trim()) {
-        setMobileError("⚠️ Mobile number is required");
-        return;
-      } else if (!mobileRegex.test(mobile.trim())) {
-        setMobileError("⚠️ Mobile number must be exactly 10 digits");
-        return;
-      }
-      // Password validation
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-      if (!password.trim()) {
-        setPasswordError("⚠️ Password is required");
-        return;
-      } else if (!passwordRegex.test(password)) {
-        setPasswordError(
-          "⚠️ Password must have 6+ chars, include uppercase, lowercase, number & symbol"
-        );
-        return;
-      }
       // API call
       const result = await axios.post(
         "http://localhost:7000/api/auth/signup",
@@ -86,14 +89,44 @@ function SignUp() {
         },
         { withCredentials: true }
       );
-
       console.log(result.data);
+      setLoading(false);
     } catch (error) {
       console.error("Signup error:", error);
       setSignUpError(error.response?.data?.message || "Signup failed");
+      setLoading(false);
     }
   };
 
+  // handleGoogleAuth
+  const handleGoogleAuth = async () => {
+    // Mobile validation
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!mobile.trim()) {
+      return setMobileError("⚠️ Mobile number is required");
+    } else if (!mobileRegex.test(mobile.trim())) {
+      return setMobileError("⚠️ Mobile number must be exactly 10 digits");
+    }
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    try {
+      const { data } = await axios.post(
+        "http://localhost:7000/api/auth/google-auth",
+        {
+          fullName: result.user.displayName,
+          email: result.user.email,
+          role,
+          mobile,
+        },
+        { withCredentials: true }
+      );
+      console.log(data);
+      setPasswordError("");
+    } catch (error) {
+      console.log(error.response?.data?.message);
+      setSignUpError(error.response?.data?.message);
+    }
+  };
   return (
     <div
       className="min-h-screen w-full flex items-center justify-center p-4"
@@ -134,6 +167,7 @@ function SignUp() {
               setFullNameError("");
             }}
             value={fullName}
+            required
           />
           <span className="name-error  text-red-600">{fullNameError}</span>
         </div>
@@ -156,6 +190,7 @@ function SignUp() {
               setEmailError("");
             }}
             value={email}
+            required
           />
           <span className="email-error  text-red-600">{emailError}</span>
         </div>
@@ -178,6 +213,7 @@ function SignUp() {
               setMobileError("");
             }}
             value={mobile}
+            required
           />
           <span className="mobile-error  text-red-600">{mobileError}</span>
         </div>
@@ -201,6 +237,7 @@ function SignUp() {
                 setPasswordError("");
               }}
               value={password}
+              required
             />
             <span className="password-error  text-red-600">
               {passwordError}
@@ -243,14 +280,21 @@ function SignUp() {
         <button
           className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
           onClick={handleSignUp}
+          disabled={loading}
         >
-          Sign Up
+          {" "}
+          {loading ? <ClipLoader size={20} color="white" /> : "Sign Up"}
         </button>
-        <p className="signup-error text-red-600 text-center">{signUpError}</p>
+        <p className="signup-error text-red-600 text-center mt-2">
+          {signUpError}
+        </p>
         <div className="text-center mt-2 " style={{ fontSize: "13px" }}>
           ----------------------------- OR ------------------------------
         </div>
-        <button className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-400 cursor-pointer hover:bg-gray-200">
+        <button
+          className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 border-gray-400 cursor-pointer hover:bg-gray-200"
+          onClick={handleGoogleAuth}
+        >
           <FcGoogle size={20} />
           <span>Continue with Google</span>
         </button>

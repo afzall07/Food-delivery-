@@ -3,6 +3,7 @@ import logo from "../images/bg-removed-logo.png";
 import { IoArrowBack } from "react-icons/io5";
 import { data, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ClipLoader } from "react-spinners";
 
 function ForgotPassword() {
   const [step, setStep] = useState(1);
@@ -13,14 +14,14 @@ function ForgotPassword() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     setSuccess("");
     setError("");
   }, [step]);
   // handle send otp
   const handleSendOtp = async () => {
-    setError("");
-    setSuccess("");
+    setLoading(true);
     try {
       const result = await axios.post(
         "http://localhost:7000/api/auth/send-otp",
@@ -31,19 +32,20 @@ function ForgotPassword() {
       );
       console.log(result.data.message);
       setSuccess(result.data.message || "✅ Otp sent successfully");
+      setLoading(false);
       setTimeout(() => {
         setStep(2);
       }, 3000);
     } catch (error) {
       console.error(error);
       setError(error.response?.data?.message || "Something went wrong");
+      setLoading(false);
     }
   };
 
   // handle verify otp
   const handleVerfyOtp = async () => {
-    setError("");
-    setSuccess("");
+    setLoading(true);
     try {
       const result = await axios.post(
         "http://localhost:7000/api/auth/verify-otp",
@@ -55,20 +57,19 @@ function ForgotPassword() {
       );
       console.log(result.data.message);
       setSuccess(result.data.message || "✅ OTP verified successfully");
+      setLoading(false);
       setTimeout(() => {
         setStep(3);
       }, 3000);
     } catch (error) {
       console.error(error);
       setError(error.response?.data?.message || "invalid Otp");
+      setLoading(false);
     }
   };
 
   // handle reset password
   const handleResetPassword = async () => {
-    setError("");
-    setSuccess("");
-
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
 
@@ -83,7 +84,7 @@ function ForgotPassword() {
       setError("⚠️ Password and Confirm Password do not match");
       return;
     }
-
+    setLoading(true);
     try {
       const result = await axios.post(
         "http://localhost:7000/api/auth/reset-password",
@@ -97,11 +98,13 @@ function ForgotPassword() {
       setSuccess(result.data.message || "✅ Password changed successfully!");
       setNewPassword("");
       setConfirmPassword("");
+      setLoading(false);
       setTimeout(() => {
         navigate("/signin");
       }, 3000);
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
+      setLoading(false);
     }
   };
 
@@ -148,8 +151,9 @@ function ForgotPassword() {
             <button
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
               onClick={handleSendOtp}
+              disabled={loading}
             >
-              Send OTP
+              {loading ? <ClipLoader size={20} color="white" /> : "Send OTP"}
             </button>
           </div>
         )}
@@ -180,8 +184,9 @@ function ForgotPassword() {
             <button
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
               onClick={handleVerfyOtp}
+              disabled={loading}
             >
-              Verify
+              {loading ? <ClipLoader size={20} color="white" /> : "Verify"}
             </button>
           </div>
         )}
@@ -228,8 +233,13 @@ function ForgotPassword() {
             <button
               className={`w-full font-semibold py-2 rounded-lg transition duration-200 bg-[#ff4d2d] text-white hover:bg-[#e64323] cursor-pointer`}
               onClick={handleResetPassword}
+              disabled={loading}
             >
-              Reset Password
+              {loading ? (
+                <ClipLoader size={20} color="white" />
+              ) : (
+                "Reset Password"
+              )}
             </button>
           </div>
         )}
