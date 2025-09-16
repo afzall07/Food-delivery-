@@ -8,6 +8,8 @@ import logo from "../images/bg-removed-logo.png";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firbase.js";
 import { ClipLoader } from "react-spinners";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice.js";
 
 function SignIn() {
   const primaryColor = "#ff4d2d";
@@ -20,6 +22,7 @@ function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   // handleSignIn
   const handleSignIn = async () => {
@@ -40,7 +43,7 @@ function SignIn() {
         },
         { withCredentials: true }
       );
-      console.log(result.data);
+      dispatch(setUserData(result.data));
       setError("");
       setLoading(false);
     } catch (error) {
@@ -62,7 +65,7 @@ function SignIn() {
         },
         { withCredentials: true }
       );
-      console.log(data);
+      dispatch(setUserData(data));
     } catch (error) {
       console.log(error.response?.data?.message);
       setError(error.response?.data?.message);
