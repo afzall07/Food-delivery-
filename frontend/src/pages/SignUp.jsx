@@ -1,4 +1,4 @@
-import React, { Profiler, useState } from "react";
+import { useState } from "react";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
@@ -8,6 +8,8 @@ import logo from "../images/bg-removed-logo.png";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../firbase";
 import { ClipLoader } from "react-spinners";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice";
 
 function SignUp() {
   const primaryColor = "#ff4d2d";
@@ -27,6 +29,7 @@ function SignUp() {
   const [mobileError, setMobileError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   // handleSignUp
   const handleSignUp = async () => {
     // clear old errors
@@ -89,7 +92,8 @@ function SignUp() {
         },
         { withCredentials: true }
       );
-      console.log(result.data);
+      dispatch(setUserData(result.data));
+
       setLoading(false);
     } catch (error) {
       console.error("Signup error:", error);
@@ -120,7 +124,7 @@ function SignUp() {
         },
         { withCredentials: true }
       );
-      console.log(data);
+      dispatch(setUserData(data));
       setPasswordError("");
     } catch (error) {
       console.log(error.response?.data?.message);
