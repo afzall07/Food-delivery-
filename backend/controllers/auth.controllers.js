@@ -34,7 +34,7 @@ export const signUp = async (req, res) => {
         });
 
         // Generate token & set cookie
-        const token = await genToken(user._id);
+        const token = genToken(user._id);
         res.cookie("token", token, {
             secure: false,
             sameSite: "strict",
@@ -67,7 +67,7 @@ export const signIn = async (req, res) => {
             return res.status(400).json({ message: "Incorrect password" });
         }
 
-        const token = await genToken(user._id);
+        const token = genToken(user._id);
         res.cookie("token", token, {
             secure: false,
             sameSite: "lax",
@@ -169,7 +169,7 @@ export const googleAuth = async (req, res) => {
             user = await User.create({ fullName, email, mobile, role });
         }
 
-        const token = await genToken(user._id);
+        const token = genToken(user._id);
         res.cookie("token", token, {
             secure: false,
             sameSite: "strict",
