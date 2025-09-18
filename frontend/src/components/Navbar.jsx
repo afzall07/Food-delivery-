@@ -5,11 +5,25 @@ import logo from "../images/bg-removed-logo.png";
 import { IoCartOutline } from "react-icons/io5";
 import { ImCross } from "react-icons/im";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setUserData } from "../redux/userSlice";
 
 function Navbar() {
-  const { userData } = useSelector((state) => state.user);
+  const { userData, city } = useSelector((state) => state.user);
   const [popUp, setPopUp] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const dispatch = useDispatch();
+  const handleLogOut = async () => {
+    try {
+      const result = await axios.get("http://localhost:7000/api/auth/logout", {
+        withCredentials: true,
+      });
+      dispatch(setUserData(null));
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="w-full h-20 flex items-center justify-between px-4 md:px-10 fixed top-0 right-0 z-50 bg-[#fff9f6] shadow-sm">
       {/* Toggle Search*/}
@@ -18,7 +32,7 @@ function Navbar() {
           {/* City */}
           <div className="flex items-center w-[30%] gap-2 px-3 border-r border-gray-300">
             <FaLocationDot size={18} className="text-[#ff4d2d]" />
-            <span className="truncate text-gray-600 text-sm">Moradabad</span>
+            <span className="truncate text-gray-600 text-sm">{city}</span>
           </div>
           {/* Search Input */}
           <div className="flex items-center w-[70%] gap-2 px-3">
@@ -40,7 +54,7 @@ function Navbar() {
         {/* City */}
         <div className="flex items-center w-[30%] gap-2 px-3 border-r border-gray-300">
           <FaLocationDot size={18} className="text-[#ff4d2d]" />
-          <span className="truncate text-gray-600 text-sm">Moradabad</span>
+          <span className="truncate text-gray-600 text-sm">{city}</span>
         </div>
         {/* Search Input */}
         <div className="flex items-center w-[70%] gap-2 px-3">
@@ -58,12 +72,12 @@ function Navbar() {
         {showSearch ? (
           <ImCross
             onClick={() => setShowSearch(false)}
-            className="text-[#ff4d2d] md:hidden"
+            className="text-[#ff4d2d] md:hidden cursor-pointer"
           />
         ) : (
           <IoMdSearch
             size={25}
-            className="text-[#ff4d2d] md:hidden"
+            className="text-[#ff4d2d] md:hidden cursor-pointer"
             onClick={() => setShowSearch(true)}
           />
         )}
@@ -98,7 +112,10 @@ function Navbar() {
             <div className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer">
               My Orders
             </div>
-            <div className="text-[#ff4d2d] font-semibold cursor-pointer">
+            <div
+              className="text-[#ff4d2d] font-semibold cursor-pointer"
+              onClick={handleLogOut}
+            >
               Log Out
             </div>
           </div>
