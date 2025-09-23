@@ -23,3 +23,23 @@ export const addItem = async (req, res) => {
         return res.status(500).json({ message: `Item add error ${error}` })
     }
 }
+
+export const editItem = async (req, res) => {
+    try {
+        const itemId = req.params.itemId
+        const { name, price, category, foodType } = req.body
+        let image;
+        if (req.file) {
+            image = await uploadOnCloudinary(req.file.path)
+        }
+        const item = await Item.findByIdAndUpdate(itemId, {
+            name, price, category, foodType, image
+        }, { new: true })
+        if (!item) {
+            return res.status(400).json({ message: `Item not found` })
+        }
+        res.status(200).json(item)
+    } catch (error) {
+        return res.status(500).json({ message: `Item edit error ${error}` })
+    }
+}
