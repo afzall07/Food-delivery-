@@ -10,7 +10,7 @@ import logo from "../images/bg-removed-logo.png";
 import { setUserData } from "../redux/userSlice";
 
 function Navbar() {
-  const { userData, city } = useSelector((state) => state.user);
+  const { userData, currentCity } = useSelector((state) => state.user);
   const { shopData } = useSelector((state) => state.owner);
   const [popUp, setPopUp] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -36,7 +36,7 @@ function Navbar() {
           <div className="flex items-center w-[30%] gap-2 px-3 border-r border-gray-300">
             <FaLocationDot className="w-4 h-4 sm:w-5 sm:h-5 text-[#ff4d2d]" />
             <span className="truncate text-gray-600 text-xs sm:text-sm">
-              {city}
+              {currentCity}
             </span>
           </div>
           {/* Search Input */}
@@ -66,7 +66,9 @@ function Navbar() {
           {/* City */}
           <div className="flex items-center w-[30%] gap-2 px-3 border-r border-gray-300">
             <FaLocationDot className="w-5 h-5 text-[#ff4d2d]" />
-            <span className="truncate text-gray-600 text-sm">{city}</span>
+            <span className="truncate text-gray-600 text-sm">
+              {currentCity}
+            </span>
           </div>
           {/* Search Input */}
           <div className="flex items-center w-[70%] gap-2 px-3">
