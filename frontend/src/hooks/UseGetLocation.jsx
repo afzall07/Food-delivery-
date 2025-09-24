@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserData, setCity } from "../redux/userSlice";
+import { setUserData, setCity, setState } from "../redux/userSlice";
 
 function UseGetLocation() {
   const dispatch = useDispatch();
@@ -15,6 +15,7 @@ function UseGetLocation() {
         `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${apiKey}`
       );
       dispatch(setCity(location?.data.results[0].city));
+      dispatch(setState(location?.data.results[0].state));
     });
   }, [userData]);
 }
