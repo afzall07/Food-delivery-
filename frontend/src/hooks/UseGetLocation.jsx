@@ -21,7 +21,12 @@ function UseGetLocation() {
       );
       dispatch(setCurrentCity(location?.data.results[0].city));
       dispatch(setCurrentState(location?.data.results[0].state));
-      dispatch(setCurrentAddress(location?.data.results[0].address));
+      dispatch(
+        setCurrentAddress(
+          location?.data.results[0].address_line2 ||
+            location?.data.results[0].address_line1
+        )
+      );
     });
   }, [userData]);
 }
