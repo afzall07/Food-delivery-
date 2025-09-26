@@ -10,7 +10,7 @@ function Home() {
   }, []);
   const { userData } = useSelector((state) => state.user);
   return (
-    <div className="w-[100vw] min-h-[100vh] p-[50px] flex flex-col  bg-[#fff9f6]">
+    <div className="w-[100vw] min-h-[100vh] p-[20px] flex flex-col  bg-[#fff9f6]">
       {userData.role == "user" && <UserDashboard />}
       {userData.role == "owner" && <OwnerDashboard />}
       {userData.role == "deliveryBoy" && <DeliveryBoy />}
