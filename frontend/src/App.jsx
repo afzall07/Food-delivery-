@@ -8,6 +8,8 @@ import { useSelector } from "react-redux";
 import Home from "./pages/Home";
 import UseGetLocation from "./hooks/UseGetLocation";
 import useGetShop from "./hooks/useGetShop";
+import CreateEditShop from "./pages/CreateEditShop";
+import AddItem from "./pages/AddItem";
 function App() {
   useGetCurrentUser();
   UseGetLocation();
@@ -30,6 +32,14 @@ function App() {
       <Route
         path="/forgot-password"
         element={!userData ? <ForgotPassword /> : <Navigate to={"/"} />}
+      />
+      <Route
+        path="/create-edit-shop"
+        element={userData ? <CreateEditShop /> : <Navigate to={"/"} />}
+      />
+      <Route
+        path="/add-item"
+        element={userData ? <AddItem /> : <Navigate to={"/"} />}
       />
     </Routes>
   );
