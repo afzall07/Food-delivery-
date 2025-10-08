@@ -10,6 +10,7 @@ import UseGetLocation from "./hooks/UseGetLocation";
 import useGetShop from "./hooks/useGetShop";
 import CreateEditShop from "./pages/CreateEditShop";
 import AddItem from "./pages/AddItem";
+import EditItem from "./pages/EditItem";
 function App() {
   useGetCurrentUser();
   UseGetLocation();
@@ -40,6 +41,10 @@ function App() {
       <Route
         path="/add-item"
         element={userData ? <AddItem /> : <Navigate to={"/"} />}
+      />
+      <Route
+        path="/edit-item/:itemId"
+        element={userData ? <EditItem /> : <Navigate to={"/"} />}
       />
     </Routes>
   );

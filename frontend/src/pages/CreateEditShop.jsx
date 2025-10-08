@@ -43,10 +43,10 @@ function CreateEditShop() {
         { withCredentials: true }
       );
       dispatch(setShopData(result.data));
+      navigate("/");
     } catch (error) {
       console.log(error);
     }
-    navigate("/");
   };
   return (
     <div className="flex flex-col justify-center items-center p-6 bg-gradient-to-br from-orange-50 to-white min-h-screen relative">

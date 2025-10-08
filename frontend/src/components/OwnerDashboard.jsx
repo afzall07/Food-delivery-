@@ -4,6 +4,7 @@ import Navbar from "./Navbar";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FaPen } from "react-icons/fa";
+import OwnerItemCard from "./OwnerItemCard";
 
 function OwnerDashboard() {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ function OwnerDashboard() {
               <p className="text-gray-500 text-xl mb-4">{shopData.address}</p>
             </div>
           </div>
-          {/* items card  */}
+          {/* add item  */}
           {shopData.items.length == 0 && (
             <div className="flex justify-center items-center p-4 sm:p-6">
               <div className="w-full max-w-md bg-white  shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
@@ -84,6 +85,14 @@ function OwnerDashboard() {
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+          {/* item card  */}
+          {shopData.items.length > 0 && (
+            <div className="flex flex-col items-center gap-4 w-full max-w-3xl">
+              {shopData.items.map((item, index) => (
+                <OwnerItemCard data={item} key={index} />
+              ))}
             </div>
           )}
         </div>

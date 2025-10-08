@@ -1,21 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { ClipLoader } from "react-spinners";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaUtensils } from "react-icons/fa";
 import { setShopData } from "../redux/ownerSlice.js";
 import axios from "axios";
 
-function AddItem() {
+function EditItem() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { shopData } = useSelector((state) => state.owner);
+  const { itemId } = useParams();
+  const [currentItem, setCurrentItem] = useState(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
-  const [frontendImage, setFrontendImage] = useState(null);
+  const [frontendImage, setFrontendImage] = useState("");
   const [backendImage, setBackendImage] = useState(null);
   const [category, setCategory] = useState("");
-  const [foodType, setFoodType] = useState("veg");
+  const [foodType, setFoodType] = useState("");
+  const [loading, setLoading] = useState(false);
   const categories = [
     "Snacks",
     "Main Cours",
@@ -44,6 +48,7 @@ function AddItem() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("name", name);
@@ -54,16 +59,39 @@ function AddItem() {
         formData.append("foodType", foodType);
       }
       const result = await axios.post(
-        "http://localhost:7000/api/item/add-item",
+        `http://localhost:7000/api/item/edit-item/${itemId}`,
         formData,
         { withCredentials: true }
       );
       dispatch(setShopData(result.data));
+      setLoading(false);
       navigate("/");
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
+  useEffect(() => {
+    const handleGetItemById = async () => {
+      try {
+        const result = await axios.get(
+          `http://localhost:7000/api/item/get-by-id/${itemId}`,
+          { withCredentials: true }
+        );
+        setCurrentItem(result.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    handleGetItemById();
+  }, [itemId]);
+  useEffect(() => {
+    setName(currentItem?.name || "");
+    setPrice(currentItem?.price || 0);
+    setCategory(currentItem?.category || "");
+    setFoodType(currentItem?.foodType || "");
+    setFrontendImage(currentItem?.image || "");
+  }, [currentItem]);
   return (
     <div className="flex flex-col justify-center items-center p-6 bg-gradient-to-br from-orange-50 to-white min-h-screen relative">
       {/*back icon*/}
@@ -83,18 +111,18 @@ function AddItem() {
             <FaUtensils className="w-16 h-16 text-[#ff4d2d]" />
           </div>
           <div className="text-3xl font-extrabold text-gray-900">
-            Add Food Item
+            Edit Food Item
           </div>
         </div>
         {/* Form */}
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Food Name
+              Name
             </label>
             <input
               type="text"
-              placeholder="Enter Shop Name"
+              placeholder="Enter Food Name"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-none
                       "
               onChange={(e) => setName(e.target.value)}
@@ -170,8 +198,9 @@ function AddItem() {
             className="w-full bg-[#ff4d2d] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all duration-200 cursor-pointer
           "
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Save
+            {loading ? <ClipLoader color="white" size={20} /> : "Save"}
           </button>
         </form>
       </div>
@@ -179,4 +208,4 @@ function AddItem() {
   );
 }
 
-export default AddItem;
+export default EditItem;
