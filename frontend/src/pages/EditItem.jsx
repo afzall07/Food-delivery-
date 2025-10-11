@@ -52,11 +52,12 @@ function EditItem() {
     try {
       const formData = new FormData();
       formData.append("name", name);
+      formData.append("price", price);
+      formData.append("category", category);
+      formData.append("foodType", foodType);
+
       if (backendImage) {
         formData.append("image", backendImage);
-        formData.append("price", price);
-        formData.append("category", category);
-        formData.append("foodType", foodType);
       }
       const result = await axios.post(
         `http://localhost:7000/api/item/edit-item/${itemId}`,
