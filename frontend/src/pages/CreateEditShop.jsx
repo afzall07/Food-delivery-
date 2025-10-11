@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FaUtensils } from "react-icons/fa";
 import { setShopData } from "../redux/ownerSlice.js";
+import { ClipLoader } from "react-spinners";
 import axios from "axios";
 
 function CreateEditShop() {
@@ -19,6 +20,7 @@ function CreateEditShop() {
   const [address, setAddress] = useState(shopData?.address || currentAddress);
   const [frontendImage, setFrontendImage] = useState(shopData?.image || null);
   const [backendImage, setBackendImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const handleImage = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -28,6 +30,7 @@ function CreateEditShop() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("name", name);
@@ -43,9 +46,11 @@ function CreateEditShop() {
         { withCredentials: true }
       );
       dispatch(setShopData(result.data));
+      setLoading(false);
       navigate("/");
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
   return (
@@ -150,8 +155,9 @@ function CreateEditShop() {
             className="w-full bg-[#ff4d2d] text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-orange-600 hover:shadow-lg transition-all duration-200 cursor-pointer
           "
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Save
+            {loading ? <ClipLoader color="white" size={20} /> : "Save"}
           </button>
         </form>
       </div>
