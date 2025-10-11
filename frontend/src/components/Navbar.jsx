@@ -8,6 +8,7 @@ import { IoCartOutline } from "react-icons/io5";
 import { MdPendingActions } from "react-icons/md";
 import logo from "../images/bg-removed-logo.png";
 import { setUserData } from "../redux/userSlice";
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
   const { userData, currentCity } = useSelector((state) => state.user);
@@ -15,6 +16,7 @@ function Navbar() {
   const [popUp, setPopUp] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleLogOut = async () => {
     try {
@@ -102,13 +104,19 @@ function Navbar() {
             {/* Add Item */}
             {shopData && (
               <>
-                <button className="hidden md:flex gap-1 items-center cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d] px-2 py-1 text-xs sm:text-sm font-medium">
+                <button
+                  className="hidden md:flex gap-1 items-center cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d] px-2 py-1 text-xs sm:text-sm font-medium"
+                  onClick={() => navigate("/add-item")}
+                >
                   <FaPlus className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                   <span className="text-xs sm:text-sm lg:text-base">
                     Add Food Item
                   </span>
                 </button>
-                <button className="md:hidden text-[#ff4d2d]">
+                <button
+                  className="md:hidden text-[#ff4d2d] cursor-pointer"
+                  onClick={() => navigate("/add-item")}
+                >
                   <FaPlus className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </>
@@ -125,7 +133,7 @@ function Navbar() {
               </span>
             </div>
             <div className="md:hidden relative text-[#ff4d2d]">
-              <MdPendingActions className="w-6 h-6 sm:w-7 sm:h-7" />
+              <MdPendingActions className="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer" />
               <span className="absolute -right-2 -top-2 text-[10px] sm:text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[5px] py-[1px]">
                 0
               </span>
@@ -165,9 +173,12 @@ function Navbar() {
               {userData.fullName.charAt(0).toUpperCase() +
                 userData.fullName.slice(1)}
             </div>
-            <div className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer">
-              My Orders
-            </div>
+            {userData.role == "user" && (
+              <div className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer">
+                My Orders
+              </div>
+            )}
+
             <div
               className="text-[#ff4d2d] font-semibold cursor-pointer"
               onClick={handleLogOut}
