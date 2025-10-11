@@ -20,7 +20,11 @@ export const addItem = async (req, res) => {
         })
         shop.items.push(item._id)
         await shop.save()
-        await shop.populate("items owner")
+        await shop.populate("owner")
+        await shop.populate({
+            path: "items",
+            options: { sort: { updatedAt: -1 } }
+        })
         return res.status(201).json(shop)
     } catch (error) {
         return res.status(500).json({ message: `Item add error ${error}` })
@@ -41,8 +45,11 @@ export const editItem = async (req, res) => {
         if (!item) {
             return res.status(400).json({ message: `Item not found` })
         }
-        const shop = await Shop.findOne({ owner: req.userId }).populate("items")
-        res.status(200).json(shop)
+        const shop = await Shop.findOne({ owner: req.userId }).populate({
+            path: "items",
+            options: { sort: { updatedAt: -1 } }
+        })
+        return res.status(200).json(shop)
     } catch (error) {
         return res.status(500).json({ message: `Item edit error ${error}` })
     }
@@ -59,4 +66,44 @@ export const getItemById = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: `get Item error ${error}` })
     }
-} 
+}
+
+export const deleteItem = async (req, res) => {
+    try {
+        const itemId = req.params.itemId
+        const item = await Item.findByIdAndDelete(itemId)
+        if (!item) {
+            return res.status(400).json({ message: "Item not found" })
+        }
+        const shop = await Shop.findOne({ owner: req.userId })
+        shop.items = shop.items.filter(i => i !== item._id)
+        await shop.save()
+        await shop.populate({
+            path: "items",
+            options: { sort: { updatedAt: -1 } }
+        })
+        return res.status(200).json(shop)
+    } catch (error) {
+        return res.status(500).json({ message: `delete Item error ${error}` })
+
+    }
+}
+
+export const getItemByCity = async (req, res) => {
+    try {
+        const { city } = req.params
+        if (!city) {
+            return res.status(400).json({ message: "city is required" })
+        }
+        const shops = await Shop.find({ city: { $regex: new RegExp(`^${city}$`, "i") } }).populate("items")
+        if (!shops) {
+            return res.status(400).json({ message: "shops not found" })
+        }
+        const shopIds = shops.map((shop) => shop._id)
+        const items = await Item.find({ shop: { $in: shopIds } })
+        return res.status(200).json(items)
+    } catch (error) {
+        return res.status(500).json({ message: `get item by city error ${error}` })
+
+    }
+}
