@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Navbar from "./Navbar";
 import { categories } from "../category";
 import CategoryCard from "./CategoryCard";
-import { FaCircleChevronLeft } from "react-icons/fa6";
-import { FaCircleChevronRight } from "react-icons/fa6";
+import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import FoodCard from "./FoodCard";
 
@@ -11,82 +10,77 @@ function UserDashboard() {
   const categScrollRef = useRef();
   const shopScrollRef = useRef();
   const itemsScrollRef = useRef();
+
   const [showLeftScrollButton, setShowLeftScrollButton] = useState(false);
   const [showRightScrollButton, setShowRightScrollButton] = useState(false);
   const [shopLeftScrollButton, setShopLeftScrollButton] = useState(false);
   const [shopRightScrollButton, setShopRightScrollButton] = useState(false);
+
   const { currentCity, shopsInMyCity, itemsInMyCity } = useSelector(
     (state) => state.user
   );
 
-  const updateScrollButton = (ref, LeftScrollButton, RightScrollButton) => {
+  //  Handles updating visibility of scroll buttons
+  const updateScrollButton = (ref, setLeftVisible, setRightVisible) => {
     const element = ref.current;
     if (element) {
-      LeftScrollButton(element.scrollLeft > 0);
-      RightScrollButton(
+      setLeftVisible(element.scrollLeft > 0);
+      setRightVisible(
         element.scrollLeft + element.clientWidth < element.scrollWidth
       );
     }
   };
+
+  //  Scroll handler for left/right movement
   const scrollHandler = (ref, direction) => {
     if (ref.current) {
       ref.current.scrollBy({
-        left: direction == "left" ? -200 : 200,
+        left: direction === "left" ? -200 : 200,
         behavior: "smooth",
       });
     }
   };
 
+  //  Setup event listeners once components mount
   useEffect(() => {
-    if (categScrollRef.current) {
+    const handleCategScroll = () => {
       updateScrollButton(
         categScrollRef,
         setShowLeftScrollButton,
         setShowRightScrollButton
       );
+    };
+
+    const handleShopScroll = () => {
       updateScrollButton(
         shopScrollRef,
         setShopLeftScrollButton,
         setShopRightScrollButton
       );
+    };
 
-      categScrollRef.current.addEventListener("scroll", () => {
-        updateScrollButton(categScrollRef, setShowLeftScrollButton),
-          setShowRightScrollButton;
-      });
-      shopScrollRef.current.addEventListener("scroll", () => {
-        updateScrollButton(
-          shopScrollRef,
-          setShopLeftScrollButton,
-          setShopRightScrollButton
-        );
-      });
-    }
+    // Initial check
+    handleCategScroll();
+    handleShopScroll();
+
+    // Add event listeners
+    categScrollRef.current?.addEventListener("scroll", handleCategScroll);
+    shopScrollRef.current?.addEventListener("scroll", handleShopScroll);
+
+    // Cleanup
     return () => {
-      categScrollRef.current.removeEventListener("scroll", () => {
-        updateScrollButton(
-          categScrollRef,
-          setShowLeftScrollButton,
-          setShowRightScrollButton
-        );
-      });
-      shopScrollRef.current.removeEventListener("scroll", () => {
-        updateScrollButton(
-          shopScrollRef,
-          setShopLeftScrollButton,
-          setShopRightScrollButton
-        );
-      });
+      categScrollRef.current?.removeEventListener("scroll", handleCategScroll);
+      shopScrollRef.current?.removeEventListener("scroll", handleShopScroll);
     };
   }, [categories]);
+
   return (
     <div className="w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6] overflow-y-auto">
       <Navbar />
+
       {/* category cards */}
       <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-[10px] mt-20">
-        <h1 className="text-gray-800 text-2xl sm:text-3xl ">
-          Choose Best Food
-        </h1>
+        <h1 className="text-gray-800 text-2xl sm:text-3xl">Choose Best Food</h1>
         <div className="w-full relative">
           {showLeftScrollButton && (
             <button
@@ -96,18 +90,20 @@ function UserDashboard() {
               <FaCircleChevronLeft />
             </button>
           )}
+
           <div
-            className="w-full flex overflow-x-auto gap-4 pb-2"
+            className="w-full flex overflow-x-auto gap-4 pb-2 no-scrollbar"
             ref={categScrollRef}
           >
             {categories?.map((categ, index) => (
               <CategoryCard
+                key={index}
                 name={categ.category}
                 image={categ.image}
-                key={index}
               />
             ))}
           </div>
+
           {showRightScrollButton && (
             <button
               className="absolute right-0 top-1/2 -translate-y-1/2 bg-[#ff4d2d] text-white p-2 rounded-full shadow-lg hover:bg-[#e64528] z-10"
@@ -119,7 +115,7 @@ function UserDashboard() {
         </div>
       </div>
 
-      {/* shop cards*/}
+      {/* shop cards */}
       <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]">
         <h1 className="text-gray-800 text-2xl sm:text-3xl">
           Best Shops in {currentCity}
@@ -133,18 +129,20 @@ function UserDashboard() {
               <FaCircleChevronLeft />
             </button>
           )}
+
           <div
-            className="w-full flex overflow-x-auto gap-4 pb-2"
+            className="w-full flex overflow-x-auto gap-4 pb-2 no-scrollbar"
             ref={shopScrollRef}
           >
             {shopsInMyCity?.length > 0 ? (
-              shopsInMyCity?.map((shop, index) => (
-                <CategoryCard name={shop.name} image={shop.image} key={index} />
+              shopsInMyCity.map((shop, index) => (
+                <CategoryCard key={index} name={shop.name} image={shop.image} />
               ))
             ) : (
               <p>No shops available in your city.</p>
             )}
           </div>
+
           {shopRightScrollButton && (
             <button
               className="absolute right-0 top-1/2 -translate-y-1/2 bg-[#ff4d2d] text-white p-2 rounded-full shadow-lg hover:bg-[#e64528] z-10"
@@ -156,7 +154,7 @@ function UserDashboard() {
         </div>
       </div>
 
-      {/* product cards  */}
+      {/* product cards */}
       <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]">
         <h1 className="text-gray-800 text-2xl sm:text-3xl">
           Suggested Food Items
