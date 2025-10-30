@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { act } from "react";
 
 const userSlice = createSlice({
     name: "user",
@@ -8,7 +9,8 @@ const userSlice = createSlice({
         currentState: null,
         currentAddress: null,
         shopsInMyCity: [],
-        itemsInMyCity: null
+        itemsInMyCity: null,
+        cartItems: []
     },
     reducers: {
         setUserData: (state, action) => {
@@ -28,8 +30,18 @@ const userSlice = createSlice({
         },
         setItemsInMyCity: (state, action) => {
             state.itemsInMyCity = action.payload
+        },
+        addToCart: (state, action) => {
+            const cartItem = action.payload
+            const existItem = state.cartItems.find(item => item.id == cartItem.id)
+            if (existItem) {
+                existItem.quantity += cartItem.quantity
+            } else {
+                state.cartItems.push(cartItem)
+            }
+
         }
     }
 })
-export const { setUserData, setCurrentCity, setCurrentState, setCurrentAddress, setShopsInMyCity, setItemsInMyCity } = userSlice.actions
+export const { setUserData, setCurrentCity, setCurrentState, setCurrentAddress, setShopsInMyCity, setItemsInMyCity, addToCart } = userSlice.actions
 export default userSlice.reducer
