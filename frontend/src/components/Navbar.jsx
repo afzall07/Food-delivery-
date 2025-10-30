@@ -11,7 +11,9 @@ import { setUserData } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 
 function Navbar() {
-  const { userData, currentCity } = useSelector((state) => state.user);
+  const { userData, currentCity, cartItems } = useSelector(
+    (state) => state.user
+  );
   const { shopData } = useSelector((state) => state.owner);
   const [popUp, setPopUp] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -146,7 +148,7 @@ function Navbar() {
               <div className="relative cursor-pointer">
                 <IoCartOutline className="w-6 h-6 sm:w-7 sm:h-7 text-[#ff4d2d]" />
                 <span className="absolute -right-2 -top-2 text-[10px] sm:text-xs font-bold text-[#ff4d2d]">
-                  0
+                  {cartItems.length}
                 </span>
               </div>
             )}
