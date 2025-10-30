@@ -90,20 +90,21 @@ function FoodCard({ data }) {
                   ? "bg-gray-800"
                   : "bg-[#ff4d2d]"
               } text-white px-3 py-2 transition-colors cursor-pointer`}
-              onClick={() =>
-                dispatch(
-                  addToCart({
-                    id: data._id,
-                    name: data.name,
-                    price: data.price,
-                    image: data.image,
-                    shop: data.shop,
-                    quantity,
-                    foodType: data.foodType,
-                  })
-                )
-              }
-              disabled={quantity === 0}
+              onClick={() => {
+                quantity > 0
+                  ? dispatch(
+                      addToCart({
+                        id: data._id,
+                        name: data.name,
+                        price: data.price,
+                        image: data.image,
+                        shop: data.shop,
+                        quantity,
+                        foodType: data.foodType,
+                      })
+                    )
+                  : null;
+              }}
             >
               <FaShoppingCart size={17} />
             </button>
