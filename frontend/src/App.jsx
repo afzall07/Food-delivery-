@@ -13,6 +13,7 @@ import AddItem from "./pages/AddItem";
 import EditItem from "./pages/EditItem";
 import useGetShopByCity from "./hooks/useGetShopByCity";
 import useGetItemsByCity from "./hooks/useGetItemsByCity";
+import CartItem from "./pages/cartItem";
 function App() {
   useGetCurrentUser();
   UseGetLocation();
@@ -49,6 +50,10 @@ function App() {
       <Route
         path="/edit-item/:itemId"
         element={userData ? <EditItem /> : <Navigate to={"/"} />}
+      />
+      <Route
+        path="/cart"
+        element={userData ? <CartItem /> : <Navigate to={"/"} />}
       />
     </Routes>
   );
