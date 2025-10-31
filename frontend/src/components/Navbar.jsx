@@ -145,7 +145,10 @@ function Navbar() {
           <>
             {/* Cart */}
             {userData.role === "user" && (
-              <div className="relative cursor-pointer">
+              <div
+                className="relative cursor-pointer"
+                onClick={() => navigate("/cart")}
+              >
                 <IoCartOutline className="w-6 h-6 sm:w-7 sm:h-7 text-[#ff4d2d]" />
                 <span className="absolute -right-2 -top-2 text-[10px] sm:text-xs font-bold text-[#ff4d2d]">
                   {cartItems.length}
