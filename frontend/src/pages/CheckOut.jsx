@@ -1,11 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { TbCurrentLocation } from "react-icons/tb";
 import { IoLocationSharp, IoSearchOutline } from "react-icons/io5";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import "leaflet/dist/leaflet.css";
+import { setLocation } from "../redux/mapSlice";
+
+function RecenterMap({ location }) {
+  if (location.lat && location.long) {
+    const map = useMap();
+    map.setView([location.lat, location.long], 15, { animate: true });
+  }
+  return null;
+}
 
 function CheckOut() {
-  const navigate = useNavigate;
+  const { location, address } = useSelector((state) => state.map);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const onDragEnd = (e) => {
+    console.log(e.target._latlng);
+    const { lat, lng } = e.target._latlng;
+    dispatch(setLocation({ lat, long: lng }));
+  };
   return (
     <div className="min-h-screen bg-[#fff9f6] flex items-center justify-center p-6">
       {/*back icon*/}
@@ -31,6 +50,7 @@ function CheckOut() {
               type="text"
               className="flex-1 border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#ff4d2d]"
               placeholder="Enter Your Location..."
+              value={address}
             />
             <button className="bg-[#ff4d2d] hover:bg-[#e64526] text-white px-3 py-2 rounded-lg flex items-center justify-center">
               <IoSearchOutline size={17} />
@@ -38,6 +58,28 @@ function CheckOut() {
             <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center justify-center">
               <TbCurrentLocation size={17} />
             </button>
+          </div>
+          {/* map  */}
+          <div className="map rounded-xl border overflow-hidden">
+            <div className="h-64 w-full flex items-center justify-center">
+              <MapContainer
+                className={"w-full h-full"}
+                center={[location?.lat, location?.long]}
+                zoom={15}
+              >
+                {" "}
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <RecenterMap location={location} />
+                <Marker
+                  position={[location?.lat, location?.long]}
+                  draggable
+                  eventHandlers={{ dragend: onDragEnd }}
+                ></Marker>
+              </MapContainer>
+            </div>
           </div>
         </section>
       </div>
