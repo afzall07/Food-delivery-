@@ -23,12 +23,15 @@ function RecenterMap({ location }) {
 
 function CheckOut() {
   const { location, address } = useSelector((state) => state.map);
-  const { cartItems } = useSelector((state) => state.user);
+  const { cartItems, totalAmount } = useSelector((state) => state.user);
   const [addressInput, setAddressInput] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const apiKey = import.meta.env.VITE_GEOAPIKEY;
+  const deliveryFee = totalAmount > 500 ? 0 : 50;
+  const amountWithDeliveryFee = totalAmount + deliveryFee;
+
   const onDragEnd = (e) => {
     const { lat, lng } = e.target._latlng;
     dispatch(setLocation({ lat, long: lng }));
@@ -204,8 +207,23 @@ function CheckOut() {
               </div>
             ))}
             <hr className="border-gray-300 my-2" />
+            <div className="flex justify-between font-medium text-gray-800">
+              <span>Subtotal</span>
+              {totalAmount}
+            </div>
+            <div className="flex justify-between font-medium text-gray-700">
+              <span>Delivery Fee</span>
+              <span>{deliveryFee == 0 ? "Free" : deliveryFee}</span>
+            </div>
+            <div className="flex justify-between text-lg font-bold text-[#ff4d2d] pt-2">
+              <span>Total</span>
+              <span>{amountWithDeliveryFee}</span>
+            </div>
           </div>
         </section>
+        <button className="w-full bg-[#ff4d2d] hover:bg-[#ff4d2d] text-white p-3 rounded-xl font-semibold cursor-pointer">
+          {paymentMethod == "cod" ? "Place Order" : "Pay & Place Order"}
+        </button>
       </div>
     </div>
   );
