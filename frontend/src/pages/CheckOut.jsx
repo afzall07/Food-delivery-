@@ -43,7 +43,7 @@ function CheckOut() {
       const location = await axios.get(
         `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&format=json&apiKey=${apiKey}`
       );
-      dispatch(setAddress(location?.data.results[0].address_line2));
+      dispatch(setAddress(location?.data?.results[0].address_line2));
     } catch (error) {
       console.log(error);
     }
@@ -71,6 +71,30 @@ function CheckOut() {
       console.log(error);
     }
   };
+
+  // place order handler
+  const handlePlaceOrder = async () => {
+    try {
+      const result = await axios.post(
+        `http://localhost:7000/api/order/place-order`,
+        {
+          paymentMethod,
+          deliveryAddress: {
+            text: addressInput,
+            latitude: location.lat,
+            longitude: location.long,
+          },
+          totalAmount,
+          cartItems,
+        },
+        { withCredentials: true }
+      );
+      console.log(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     setAddressInput(address);
   }, [address]);
@@ -221,7 +245,10 @@ function CheckOut() {
             </div>
           </div>
         </section>
-        <button className="w-full bg-[#ff4d2d] hover:bg-[#ff4d2d] text-white p-3 rounded-xl font-semibold cursor-pointer">
+        <button
+          className="w-full bg-[#ff4d2d] hover:bg-[#ff4d2d] text-white p-3 rounded-xl font-semibold cursor-pointer"
+          onClick={handlePlaceOrder}
+        >
           {paymentMethod == "cod" ? "Place Order" : "Pay & Place Order"}
         </button>
       </div>
