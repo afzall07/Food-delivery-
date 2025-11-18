@@ -15,12 +15,16 @@ import useGetShopByCity from "./hooks/useGetShopByCity";
 import useGetItemsByCity from "./hooks/useGetItemsByCity";
 import CartItem from "./pages/cartItem";
 import CheckOut from "./pages/CheckOut";
+import OrderPlaced from "./pages/OrderPlaced";
+import MyOrders from "./pages/MyOrders";
+import useGetMyOrders from "./hooks/useGetMyOrders";
 function App() {
   useGetCurrentUser();
   UseGetLocation();
   useGetShop();
   useGetShopByCity();
   useGetItemsByCity();
+  useGetMyOrders()
   const { userData } = useSelector((state) => state.user);
   return (
     <Routes>
@@ -59,6 +63,14 @@ function App() {
       <Route
         path="/checkout"
         element={userData ? <CheckOut /> : <Navigate to={"/signin"} />}
+      />
+      <Route
+        path="/order-placed"
+        element={userData ? <OrderPlaced /> : <Navigate to={"/signin"} />}
+      />
+      <Route
+        path="/my-orders"
+        element={userData ? <MyOrders /> : <Navigate to={"/signin"} />}
       />
     </Routes>
   );
