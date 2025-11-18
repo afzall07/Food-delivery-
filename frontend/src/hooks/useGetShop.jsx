@@ -21,7 +21,7 @@ function useGetShop() {
       }
     };
     fetchShop();
-  }, [userData]);
+  }, [dispatch, userData]);
 }
 
 export default useGetShop;
