@@ -4,6 +4,7 @@ const shopOrderItemSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Item"
     },
+    name: String,
     price: Number,
     quantity: Number
 }, { timestamps: true })
@@ -37,7 +38,7 @@ const orderSchema = new mongoose.Schema({
     totalAmount: {
         type: Number
     },
-    shopOrder: [shopOrderSchema]
+    shopOrders: [shopOrderSchema]
 }, { timestamps: true })
 
 const Order = mongoose.model("Order", orderSchema)
