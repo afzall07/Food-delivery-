@@ -78,7 +78,16 @@ export const getMyOrders = async (req, res) => {
                 .populate("shopOrders.shop", "name")
                 .populate("user")
                 .populate("shopOrders.shopOrderItems.item", "name image price");
-            return res.status(200).json(orders)
+            
+            const filteredOrders = orders.map((order) => ({
+                _id: order._id,
+                paymentMethod: order.paymentMethod,
+                user: order.user,
+                shopOrders: order.shopOrders.find(o => o.owner._id == req.userId),
+                createdAt: order.createdAt,
+                deliveryAddress:order.deliveryAddress
+            }))
+            return res.status(200).json(filteredOrders)
         }
         return res.status(403).json({ message: "Forbidden: Invalid user role." });
     } catch (error) {
