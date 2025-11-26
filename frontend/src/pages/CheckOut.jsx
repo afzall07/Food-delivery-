@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { MdDeliveryDining } from "react-icons/md";
 import { FaMobileScreenButton } from "react-icons/fa6";
 import { FaCreditCard } from "react-icons/fa";
+import { addMyOrder } from "../redux/userSlice";
 
 function RecenterMap({ location }) {
   if (location.lat && location.long) {
@@ -89,7 +90,7 @@ function CheckOut() {
         },
         { withCredentials: true }
       );
-      console.log(result.data);
+      dispatch(addMyOrder(result.data))
       navigate('/order-placed')
     } catch (error) {
       console.log(error);
