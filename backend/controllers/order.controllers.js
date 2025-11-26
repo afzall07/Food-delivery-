@@ -49,6 +49,8 @@ export const placeOrder = async (req, res) => {
             totalAmount,
             shopOrders
         })
+        await newOrder.populate("shopOrders.shopOrderItems.item", "name image price")
+        await newOrder.populate("shopOrders.shop", "name")
 
         return res.status(201).json(newOrder)
     } catch (error) {
@@ -96,6 +98,30 @@ export const getMyOrders = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: `Internal Server Error while fetching orders.`
+        });
+    }
+}
+
+export const updateOrderStatus= async (req, res) => {
+    try {
+        const { orderId, shopId } = req.params;
+        const { status } = req.body;
+        const order = await Order.findById(orderId);
+
+        const shopOrder = order.shopOrders.find(o => o.shop == shopId)
+        if (!shopOrder) {
+            return res.status(400).json({message:"shop order not found!"})
+        }
+        shopOrder.status = status;
+        await shopOrder.save()
+        await order.save()
+        return res.status(200).json(shopOrder.status)
+    }catch (error) {
+        console.error("order status Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: `Internal Server Error while fetching order status.`
         });
     }
 }
