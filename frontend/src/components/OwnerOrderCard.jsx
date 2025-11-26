@@ -2,8 +2,21 @@ import React from 'react'
 import { MdPhone } from "react-icons/md"
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { CgMail } from "react-icons/cg";
+import axios from 'axios'
+import {useDispatch} from 'react-redux'
+import { updateOrderStatus } from '../redux/userSlice';
+
 
 function OwnerOrderCard({ data }) {
+  const dispatch = useDispatch()
+  const handleUpdateStatus = async (orderId, shopId, status) => {
+    try {
+      const result = await axios.post(`http://localhost:7000/api/order/update-status/${orderId}/${shopId}`, { status }, { withCredentials: true })
+      dispatch(updateOrderStatus({orderId, shopId, status}))
+    } catch (error) {
+console.log(error)
+    }
+  }
   return (
     <div className='bg-white rounded-lg shadow p-4 space-y-4'><div>
       <h2 className='text-2xl font-semibold text-gray-800 mb-1'>{data.user.fullName}</h2>
@@ -28,13 +41,14 @@ function OwnerOrderCard({ data }) {
       </div>
       <div className='flex justify-between items-center mt-auto pt-3 border-t border-gray-100'>
         <span className='text-sm'>Status: <span className='font-semibold capitalize text-[#ff4d2d]'>{data.shopOrders.status}</span></span>
-        <select name="" id="" value={data.shopOrders.status} className='rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 border-[#ff4d2d] text-[#ff4d2d]'>
+        <select className='rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 border-[#ff4d2d] text-[#ff4d2d]' onChange={(e)=>handleUpdateStatus(data._id,data.shopOrders.shop._id,e.target.value)}>
+          <option value="">Change</option>
           <option value="pending">Pending</option>
           <option value="preparing">Preparing</option>
           <option value="out of delivery">Out of Delivery</option>
         </select>
       </div>
-      <div className='text-right font-bold text-gray-800 text-sm'>Total: ₹{ data.shopOrders.subTotal}</div>
+      <div className='text-right font-bold text-gray-800 text-sm'>Total: ₹{data.shopOrders.subTotal}</div>
     </div>
   )
 }
