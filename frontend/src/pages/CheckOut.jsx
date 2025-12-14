@@ -146,20 +146,25 @@ function CheckOut() {
             <div className="h-64 w-full flex items-center justify-center">
               <MapContainer
                 className={"w-full h-full"}
-                center={[location?.lat, location?.long]}
+                center={
+                  location?.lat && location?.long
+                    ? [location.lat, location.long]
+                    : [20.5937, 78.9629]
+                }
                 zoom={15}
               >
-                {" "}
                 <TileLayer
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <RecenterMap location={location} />
-                <Marker
-                  position={[location?.lat, location?.long]}
-                  draggable
-                  eventHandlers={{ dragend: onDragEnd }}
-                ></Marker>
+                {location?.lat && location?.long && (
+                  <Marker
+                    position={[location.lat, location.long]}
+                    draggable
+                    eventHandlers={{ dragend: onDragEnd }}
+                  />
+                )}
               </MapContainer>
             </div>
           </div>
@@ -173,11 +178,10 @@ function CheckOut() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* cod */}
             <div
-              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition cursor-pointer ${
-                paymentMethod === "cod"
-                  ? "border-[#ff4d2d] bg-orange-50 shadow"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
+              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition cursor-pointer ${paymentMethod === "cod"
+                ? "border-[#ff4d2d] bg-orange-50 shadow"
+                : "border-gray-200 hover:border-gray-300"
+                }`}
               onClick={() => setPaymentMethod("cod")}
             >
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
@@ -192,11 +196,10 @@ function CheckOut() {
             </div>
             {/* online */}
             <div
-              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition cursor-pointer ${
-                paymentMethod === "online"
-                  ? "border-[#ff4d2d] bg-orange-50 shadow"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
+              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition cursor-pointer ${paymentMethod === "online"
+                ? "border-[#ff4d2d] bg-orange-50 shadow"
+                : "border-gray-200 hover:border-gray-300"
+                }`}
               onClick={() => setPaymentMethod("online")}
             >
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">

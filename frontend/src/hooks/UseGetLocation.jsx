@@ -108,8 +108,13 @@ function UseGetLocation() {
     
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        fetchLocationData, 
-        handleGeoLocationError
+        fetchLocationData,
+        handleGeoLocationError,
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout:1000
+        }
       );
     } else {
       console.error("Geolocation is not supported by this browser.");

@@ -7,7 +7,7 @@ export const isAuth = async (req, res, next) => {
         }
         const decodeToken = jwt.verify(token, process.env.JWT_SECRET)
         if (!decodeToken) {
-            res.status(400).json({ message: "token not verified" })
+            return res.status(400).json({ message: "token not verified" })
         }
         req.userId = decodeToken.userId
         next()
