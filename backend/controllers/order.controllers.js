@@ -80,14 +80,14 @@ export const getMyOrders = async (req, res) => {
                 .populate("shopOrders.shop", "name")
                 .populate("user")
                 .populate("shopOrders.shopOrderItems.item", "name image price");
-            
+
             const filteredOrders = orders.map((order) => ({
                 _id: order._id,
                 paymentMethod: order.paymentMethod,
                 user: order.user,
                 shopOrders: order.shopOrders.find(o => o.owner._id == req.userId),
                 createdAt: order.createdAt,
-                deliveryAddress:order.deliveryAddress
+                deliveryAddress: order.deliveryAddress
             }))
             return res.status(200).json(filteredOrders)
         }
@@ -102,7 +102,7 @@ export const getMyOrders = async (req, res) => {
     }
 }
 
-export const updateOrderStatus= async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
     try {
         const { orderId, shopId } = req.params;
         const { status } = req.body;
@@ -110,13 +110,12 @@ export const updateOrderStatus= async (req, res) => {
 
         const shopOrder = order.shopOrders.find(o => o.shop == shopId)
         if (!shopOrder) {
-            return res.status(400).json({message:"shop order not found!"})
+            return res.status(400).json({ message: "shop order not found!" })
         }
         shopOrder.status = status;
-        await shopOrder.save()
         await order.save()
         return res.status(200).json(shopOrder.status)
-    }catch (error) {
+    } catch (error) {
         console.error("order status Error:", error);
 
         return res.status(500).json({
