@@ -48,7 +48,7 @@ import { setAddress, setLocation } from "../redux/mapSlice";
 
 function UseGetLocation() {
   const dispatch = useDispatch();
-  const { userData } = useSelector((state) => state.user); 
+  const { userData } = useSelector((state) => state.user);
   const apiKey = import.meta.env.VITE_GEOAPIKEY;
   const handleGeoLocationError = (error) => {
     let errorMessage = "Geolocation error occurred.";
@@ -80,12 +80,12 @@ function UseGetLocation() {
       dispatch(setLocation({ lat: latitude, long: longitude }));
       try {
         const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${latitude}&lon=${longitude}&format=json&apiKey=${apiKey}`;
-        
+
         axios.get(url)
           .then((response) => {
             const result = response.data.results[0];
             if (result) {
-              dispatch(setCurrentCity(result.city));
+              dispatch(setCurrentCity(result.city || result.county));
               dispatch(setCurrentState(result.state));
               dispatch(
                 setCurrentAddress(
@@ -96,6 +96,7 @@ function UseGetLocation() {
             } else {
               console.warn("Geoapify: No reverse geocoding results found.");
             }
+            // console.log("Geoapify Result:", result)
           })
           .catch((axiosError) => {
             console.error("Geoapify API Error:", axiosError.message);
@@ -105,25 +106,25 @@ function UseGetLocation() {
         console.error("General API Fetch Error:", error);
       }
     };
-    
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         fetchLocationData,
         handleGeoLocationError,
         {
           enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout:1000
+          maximumAge: 10000,
+          timeout: 30000
         }
       );
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
-    
+
   }, [userData, dispatch, apiKey]);
 
   // Hook कुछ भी रेंडर नहीं करता, इसलिए null रिटर्न करना वैकल्पिक है
-  return null; 
+  return null;
 }
 
 export default UseGetLocation;

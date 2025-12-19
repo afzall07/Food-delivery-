@@ -3,18 +3,23 @@ import { MdPhone } from "react-icons/md"
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { CgMail } from "react-icons/cg";
 import axios from 'axios'
-import {useDispatch} from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { updateOrderStatus } from '../redux/userSlice';
+import { serverUrl } from '../App';
+import { useState } from 'react';
 
 
 function OwnerOrderCard({ data }) {
+  const [availableBoys, setAvailableBoys] = useState([])
   const dispatch = useDispatch()
   const handleUpdateStatus = async (orderId, shopId, status) => {
     try {
-      const result = await axios.post(`http://localhost:7000/api/order/update-status/${orderId}/${shopId}`, { status }, { withCredentials: true })
-      dispatch(updateOrderStatus({orderId, shopId, status}))
+      const result = await axios.post(`${serverUrl}/api/order/update-status/${orderId}/${shopId}`, { status }, { withCredentials: true })
+      dispatch(updateOrderStatus({ orderId, shopId, status }))
+      setAvailableBoys(result.data.availableBoys)
+      console.log(result.data)
     } catch (error) {
-console.log(error)
+      console.log(error)
     }
   }
   return (
@@ -41,7 +46,7 @@ console.log(error)
       </div>
       <div className='flex justify-between items-center mt-auto pt-3 border-t border-gray-100'>
         <span className='text-sm'>Status: <span className='font-semibold capitalize text-[#ff4d2d]'>{data.shopOrders.status}</span></span>
-        <select className='rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 border-[#ff4d2d] text-[#ff4d2d]' onChange={(e)=>handleUpdateStatus(data._id,data.shopOrders.shop._id,e.target.value)}>
+        <select className='rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 border-[#ff4d2d] text-[#ff4d2d]' onChange={(e) => handleUpdateStatus(data._id, data.shopOrders.shop._id, e.target.value)}>
           <option value="">Change</option>
           <option value="pending">Pending</option>
           <option value="preparing">Preparing</option>

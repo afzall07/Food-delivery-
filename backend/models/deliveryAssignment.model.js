@@ -20,16 +20,16 @@ const deliveryAssignmentSchema = new mongoose.Schema({
     assignedTo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        default:null
+        default: null
     },
     status: {
         type: String,
         enum: ["brodcasted", "assigned", "completed"],
-        default:"brodcasted"
+        default: "brodcasted"
     },
-    acceptedAt:Date
+    acceptedAt: Date
 
 }, { timestamps: true })
 
-const deliveryAssignment = mongoose.model("DeliveryAssignment", deliveryAssignmentSchema)
-export default deliveryAssignment
+const DeliveryAssignment = mongoose.model("DeliveryAssignment", deliveryAssignmentSchema)
+export default DeliveryAssignment
