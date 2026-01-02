@@ -23,29 +23,29 @@ export const updateUserLocation = async (req, res) => {
 
         if (isNaN(latitude) || isNaN(longitude)) {
             console.error("COORDINATE CHECK FAILED: NaN found. Input body:", req.body);
-            return res.status(400).json({ 
-                success: false, 
-                message: "Invalid latitude or longitude value provided." 
+            return res.status(400).json({
+                success: false,
+                message: "Invalid latitude or longitude value provided."
             });
         }
-        
-       
+
+
         const updateData = {
             location: {
                 type: 'Point',
-                coordinates: [longitude, latitude] // [Long, Lat] क्रम सही है
+                coordinates: [longitude, latitude] // [Long, Lat] 
             }
         };
 
-      
+
         const user = await User.findByIdAndUpdate(req.userId, updateData, { new: true });
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        
+
         return res.status(200).json({ message: "Location updated successfully" });
-        
+
     } catch (error) {
         console.error("update user location Error:", error);
         return res.status(500).json({
