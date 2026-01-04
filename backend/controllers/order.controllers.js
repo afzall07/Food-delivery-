@@ -186,3 +186,31 @@ export const updateOrderStatus = async (req, res) => {
         });
     }
 }
+
+export const getDeliveryBoyAssignments = async (req, res) => {
+    try {
+        const deliveryBoyId = req.userId;
+        const assignments = await DeliveryAssignment.find({
+            brodcastedTo: deliveryBoyId,
+            status: "brodcasted"
+        }).populate("order")
+            .populate("shop");
+
+        const formated = assignments.map(a => ({
+            assignmentId: a._id,
+            orderId: a.order._id,
+            shopName: a.shop.name,
+            deliveryAddress: a.order.deliveryAddress,
+            items: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId)).shopOrderItems || [],
+            subTotal: a.order.shopOrders.find(so => so._id.equals(a.shopOrderId))?.subTotal
+        }))
+        return res.status(200).json(formated)
+    } catch (error) {
+        console.error("get assignment order Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: `Internal Server Error while fetching get assignment order ${error}.`
+        });
+    }
+}
