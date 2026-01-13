@@ -125,7 +125,7 @@ function Navbar() {
             )}
 
             {/* Pending Orders */}
-            <div className="hidden md:flex items-center gap-1 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d] px-2 py-1 text-xs sm:text-sm font-medium relative" onClick={()=>navigate("/my-orders")}>
+            <div className="hidden md:flex items-center gap-1 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d] px-2 py-1 text-xs sm:text-sm font-medium relative" onClick={() => navigate("/my-orders")}>
               <MdPendingActions className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
               <span className="text-xs sm:text-sm lg:text-base">
                 Pending Orders
@@ -134,7 +134,7 @@ function Navbar() {
                 0
               </span>
             </div>
-            <div className="md:hidden relative text-[#ff4d2d]" onClick={()=>navigate("/my-orders")}>
+            <div className="md:hidden relative text-[#ff4d2d]" onClick={() => navigate("/my-orders")}>
               <MdPendingActions className="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer" />
               <span className="absolute -right-2 -top-2 text-[10px] sm:text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[5px] py-[1px]">
                 0
@@ -144,7 +144,7 @@ function Navbar() {
         ) : (
           <>
             {/* Cart */}
-            {userData.role === "user" && (
+            {userData.role === "user" && (<>
               <div
                 className="relative cursor-pointer"
                 onClick={() => navigate("/cart")}
@@ -154,12 +154,14 @@ function Navbar() {
                   {cartItems.length}
                 </span>
               </div>
+              {/* Orders */}
+              <button className="hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-xs sm:text-sm font-medium cursor-pointer" onClick={() => navigate("/my-orders")}>
+                My Orders
+              </button>
+            </>
             )}
 
-            {/* Orders */}
-            <button className="hidden md:block px-3 py-1 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] text-xs sm:text-sm font-medium cursor-pointer" onClick={()=>navigate("/my-orders")}>
-              My Orders
-            </button>
+
           </>
         )}
 
@@ -179,7 +181,7 @@ function Navbar() {
                 userData.fullName.slice(1)}
             </div>
             {userData.role == "user" && (
-              <div className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer" onClick={()=>navigate("/my-orders")}>
+              <div className="md:hidden text-[#ff4d2d] font-semibold cursor-pointer" onClick={() => navigate("/my-orders")}>
                 My Orders
               </div>
             )}
