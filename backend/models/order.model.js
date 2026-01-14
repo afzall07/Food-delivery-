@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 const shopOrderItemSchema = new mongoose.Schema({
     item: {
         type: mongoose.Schema.Types.ObjectId,
@@ -32,6 +32,19 @@ const shopOrderSchema = new mongoose.Schema({
     assignedDeliveryBoy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
+    },
+    deliveryOtp: {
+        type: String,
+        default: null
+    },
+    otpExpires: {
+        type: Date,
+        default: null
+    },
+    deliveredAt: {
+        type: Date,
+        default: null
+
     }
 }, { timestamps: true })
 
