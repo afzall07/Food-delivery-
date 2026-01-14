@@ -10,6 +10,7 @@ function DeliveryBoy() {
   const [currentOrder, setCurrentOrder] = useState();
   const [availableAssignments, setAvailableAssignments] = useState(null)
   const [showOtpBox, setShowOtpBox] = useState(false)
+  const [otp, setOtp] = useState("")
   const getAssignments = async () => {
     try {
       const result = await axios.get(`${serverUrl}/api/order/get-assignments`, { withCredentials: true })
@@ -26,7 +27,7 @@ function DeliveryBoy() {
     } catch (error) {
       console.log(`getCurrentOrder error ${error}`)
     }
-  }
+  };
   const acceptOrder = async (assignmentId) => {
     try {
       const result = await axios.get(`${serverUrl}/api/order/accept-order/${assignmentId}`, { withCredentials: true })
@@ -37,9 +38,25 @@ function DeliveryBoy() {
     }
   };
 
-  const handleSendOtp = () => {
-    setShowOtpBox(true)
-  }
+  const sendOtp = async () => {
+    try {
+      const result = await axios.post(`${serverUrl}/api/order/send-delivery-otp/`, { orderId: currentOrder._id, shopOrderId: currentOrder.shopOrder._id }, { withCredentials: true })
+      setShowOtpBox(true)
+      console.log(result.data)
+
+    } catch (error) {
+      console.log(`sendOtp error ${error}`)
+    }
+  };
+
+  const verifyOtp = async () => {
+    try {
+      const result = await axios.post(`${serverUrl}/api/order/verify-delivery-otp/`, { orderId: currentOrder._id, shopOrderId: currentOrder.shopOrder._id, otp }, { withCredentials: true })
+      console.log(result.data)
+    } catch (error) {
+      console.log(`verifyOtp error ${error}`)
+    }
+  };
 
   useEffect(() => {
     getAssignments()
@@ -83,10 +100,10 @@ function DeliveryBoy() {
               <p className="text-xs text-gray-400">{currentOrder.shopOrder.shopOrderItems.length} items | ₹{currentOrder.shopOrder.subTotal}</p>
             </div>
             <DeliveryBoyTracking data={currentOrder} />
-            {!showOtpBox ? <button className="mt-4 w-full bg-green-500 text-white font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-green-600 active:scale-95 transition-all duration-200" onClick={handleSendOtp}>Mark as Delivered</button> : <div className="mt-4 p-4 border rounded-xl bg-gray-50">
+            {!showOtpBox ? <button className="mt-4 w-full bg-green-500 text-white font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-green-600 active:scale-95 transition-all duration-200" onClick={sendOtp}>Mark as Delivered</button> : <div className="mt-4 p-4 border rounded-xl bg-gray-50">
               <p className="text-sm font-semibold mb-2">Enter OTP send to <span className="text-[#ff4d2d]">{currentOrder.user.fullName}</span></p>
-              <input type="text" className="w-full border px-3 py-2 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="Enter OTP" />
-              <button className="w-full bg-[#ff4d2d] text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-all">Submit OTP</button>
+              <input type="text" className="w-full border px-3 py-2 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-orange-400" placeholder="Enter OTP" onChange={(e) => setOtp(e.target.value)} value={otp} />
+              <button className="w-full bg-[#ff4d2d] text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-all" onClick={verifyOtp}>Submit OTP</button>
             </div>}
           </div>}
       </div>
