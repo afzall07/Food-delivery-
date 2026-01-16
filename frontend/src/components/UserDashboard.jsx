@@ -5,6 +5,7 @@ import CategoryCard from "./CategoryCard";
 import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import FoodCard from "./FoodCard";
+import { useNavigate } from "react-router-dom";
 
 function UserDashboard() {
   const categScrollRef = useRef();
@@ -15,10 +16,26 @@ function UserDashboard() {
   const [showRightScrollButton, setShowRightScrollButton] = useState(false);
   const [shopLeftScrollButton, setShopLeftScrollButton] = useState(false);
   const [shopRightScrollButton, setShopRightScrollButton] = useState(false);
-
+  const [updatedItemsList, setUpdatedItemsList] = useState([]);
   const { currentCity, shopsInMyCity, itemsInMyCity } = useSelector(
     (state) => state.user
   );
+  const navigate = useNavigate()
+
+  const handleFilterByCategory = (category) => {
+    if (category == "All") {
+      setUpdatedItemsList(itemsInMyCity)
+    } else {
+      const filteredList = itemsInMyCity?.filter(i => i.category === category)
+      setUpdatedItemsList(filteredList)
+    }
+  };
+
+  useEffect(() => {
+    setUpdatedItemsList(itemsInMyCity)
+
+  }, [itemsInMyCity])
+
 
   //  Handles updating visibility of scroll buttons
   const updateScrollButton = (ref, setLeftVisible, setRightVisible) => {
@@ -100,6 +117,7 @@ function UserDashboard() {
                 key={index}
                 name={categ.category}
                 image={categ.image}
+                onClick={() => handleFilterByCategory(categ.category)}
               />
             ))}
           </div>
@@ -136,7 +154,7 @@ function UserDashboard() {
           >
             {shopsInMyCity?.length > 0 ? (
               shopsInMyCity.map((shop, index) => (
-                <CategoryCard key={index} name={shop.name} image={shop.image} />
+                <CategoryCard key={index} name={shop.name} image={shop.image} onClick={() => navigate(`/shop/${shop._id}`)} />
               ))
             ) : (
               <p>No shops available in your city.</p>
@@ -160,7 +178,7 @@ function UserDashboard() {
           Suggested Food Items
         </h1>
         <div className="w-full h-auto flex flex-wrap gap-[20px] justify-center">
-          {itemsInMyCity?.map((item, index) => (
+          {updatedItemsList?.map((item, index) => (
             <FoodCard data={item} key={index} />
           ))}
         </div>
