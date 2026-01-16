@@ -20,6 +20,7 @@ import MyOrders from "./pages/MyOrders";
 import useGetMyOrders from "./hooks/useGetMyOrders";
 import useUpdateLocation from "./hooks/useUpdateLocation";
 import TrackOrderPage from "./pages/TrackOrderPage";
+import Shop from "./pages/Shop";
 export const serverUrl = "http://localhost:7000"
 function App() {
   useGetCurrentUser();
@@ -79,6 +80,10 @@ function App() {
       <Route
         path="/track-order/:orderId"
         element={userData ? <TrackOrderPage /> : <Navigate to={"/signin"} />}
+      />
+      <Route
+        path="/shop/:shopId"
+        element={userData ? <Shop /> : <Navigate to={"/signin"} />}
       />
     </Routes>
   );
