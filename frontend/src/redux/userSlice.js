@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { act } from "react";
 
 const userSlice = createSlice({
     name: "user",
@@ -12,7 +11,8 @@ const userSlice = createSlice({
         itemsInMyCity: null,
         cartItems: [],
         totalAmount: 0,
-        myOrders:[]
+        myOrders: [],
+        searchItems: null
     },
     reducers: {
         setUserData: (state, action) => {
@@ -57,7 +57,7 @@ const userSlice = createSlice({
             state.totalAmount = state.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
         },
         setMyOrders: (state, action) => {
-            state.myOrders=action.payload
+            state.myOrders = action.payload
         },
         addMyOrder: (state, action) => {
             state.myOrders = [action.payload, ...state.myOrders]
@@ -66,13 +66,16 @@ const userSlice = createSlice({
             const { orderId, shopId, status } = action.payload
             const order = state.myOrders.find(o => o._id == orderId)
             if (order) {
-                if (order.shopOrders && order.shopOrders.shop._id==shopId) {
-                 order.shopOrders.status=status   
+                if (order.shopOrders && order.shopOrders.shop._id == shopId) {
+                    order.shopOrders.status = status
                 }
             }
+        },
+        setSearchItems: (state, action) => {
+            state.searchItems = action.payload
         }
 
     }
 })
-export const { setUserData, setCurrentCity, setCurrentState, setCurrentAddress, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem , setMyOrders, addMyOrder,updateOrderStatus} = userSlice.actions
+export const { setUserData, setCurrentCity, setCurrentState, setCurrentAddress, setShopsInMyCity, setItemsInMyCity, addToCart, updateQuantity, removeCartItem, setMyOrders, addMyOrder, updateOrderStatus, setSearchItems } = userSlice.actions
 export default userSlice.reducer

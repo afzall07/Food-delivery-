@@ -7,8 +7,10 @@ import { ImCross } from "react-icons/im";
 import { IoCartOutline } from "react-icons/io5";
 import { MdPendingActions } from "react-icons/md";
 import logo from "../images/bg-removed-logo.png";
-import { setUserData } from "../redux/userSlice";
+import { setSearchItems, setUserData } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
+import { serverUrl } from "../App";
+import { useEffect } from "react";
 
 function Navbar() {
   const { userData, currentCity, cartItems } = useSelector(
@@ -19,6 +21,7 @@ function Navbar() {
   const [showSearch, setShowSearch] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [query, setQuery] = useState("")
 
   const handleLogOut = async () => {
     try {
@@ -30,6 +33,23 @@ function Navbar() {
       console.log(error);
     }
   };
+
+  const handleSearchItems = async () => {
+    try {
+      const result = await axios.get(`${serverUrl}/api/item/search-items?query=${query}&city=${currentCity}`, { withCredentials: true })
+      dispatch(setSearchItems(result.data))
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  useEffect(() => {
+    if (query) {
+      handleSearchItems()
+    } else {
+      dispatch(setSearchItems(null))
+    }
+  }, [query])
 
   return (
     <div className="w-full h-20 flex items-center justify-between px-4 md:px-10 fixed top-0 right-0 z-50 bg-[#fff9f6] shadow-sm">
@@ -50,6 +70,8 @@ function Navbar() {
               type="text"
               placeholder="Search delicious food..."
               className="w-full text-gray-700 text-xs sm:text-sm outline-none"
+              onChange={(e) => setQuery(e.target.value)}
+              value={query}
             />
           </div>
         </div>
@@ -81,6 +103,8 @@ function Navbar() {
               type="text"
               placeholder="Search delicious food..."
               className="w-full text-gray-700 text-sm outline-none"
+              onChange={(e) => setQuery(e.target.value)}
+              value={query}
             />
           </div>
         </div>

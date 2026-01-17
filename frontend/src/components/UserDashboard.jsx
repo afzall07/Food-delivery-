@@ -17,7 +17,7 @@ function UserDashboard() {
   const [shopLeftScrollButton, setShopLeftScrollButton] = useState(false);
   const [shopRightScrollButton, setShopRightScrollButton] = useState(false);
   const [updatedItemsList, setUpdatedItemsList] = useState([]);
-  const { currentCity, shopsInMyCity, itemsInMyCity } = useSelector(
+  const { currentCity, shopsInMyCity, itemsInMyCity, searchItems } = useSelector(
     (state) => state.user
   );
   const navigate = useNavigate()
@@ -94,6 +94,17 @@ function UserDashboard() {
   return (
     <div className="w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6] overflow-y-auto">
       <Navbar />
+
+      {searchItems && searchItems.length > 0 && (
+        <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-5 bg-white shadow-md rounded-2xl mt-4">
+          <h1 className="text-gray-800 text-2xl sm:text-3xl font-semibold border-b border-gray-200 pb-2">Search Results</h1>
+          <div className="w-full h-auto flex flex-wrap gap-6 justify-center">
+            {searchItems.map(item => (
+              <FoodCard data={item} key={item._id} />
+            ))}
+          </div>
+
+        </div>)}
 
       {/* category cards */}
       <div className="w-full max-w-6xl flex flex-col gap-5 items-start p-[10px] mt-20">

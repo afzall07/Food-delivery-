@@ -13,6 +13,7 @@ import { MdDeliveryDining } from "react-icons/md";
 import { FaMobileScreenButton } from "react-icons/fa6";
 import { FaCreditCard } from "react-icons/fa";
 import { addMyOrder } from "../redux/userSlice";
+import { serverUrl } from "../App";
 
 function RecenterMap({ location }) {
   if (location.lat && location.long) {
@@ -24,7 +25,7 @@ function RecenterMap({ location }) {
 
 function CheckOut() {
   const { location, address } = useSelector((state) => state.map);
-  const { cartItems, totalAmount } = useSelector((state) => state.user);
+  const { cartItems, totalAmount, userData } = useSelector((state) => state.user);
   const [addressInput, setAddressInput] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const navigate = useNavigate();
@@ -51,12 +52,10 @@ function CheckOut() {
   };
 
   const getCurrentLocation = () => {
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      dispatch(setLocation({ lat: latitude, long: longitude }));
-      getAddressByLatLng(latitude, longitude);
-    });
+    const latitude = userData.location.coordinates[1]
+    const longitude = userData.location.coordinates[0]
+    dispatch(setLocation({ lat: latitude, long: longitude }));
+    getAddressByLatLng(latitude, longitude);
   };
 
   const getLatLngByAddress = async () => {
@@ -77,7 +76,7 @@ function CheckOut() {
   const handlePlaceOrder = async () => {
     try {
       const result = await axios.post(
-        `http://localhost:7000/api/order/place-order`,
+        `${serverUrl}/api/order/place-order`,
         {
           paymentMethod,
           deliveryAddress: {
@@ -90,12 +89,43 @@ function CheckOut() {
         },
         { withCredentials: true }
       );
-      dispatch(addMyOrder(result.data))
-      navigate('/order-placed')
+      if (paymentMethod == "cod") {
+        dispatch(addMyOrder(result.data))
+        navigate('/order-placed')
+      } else {
+        const orderId = result.data.orderId;
+        const razorOrder = result.data.razorOrder
+        handleRazorpayWindow(orderId, razorOrder)
+      };
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleRazorpayWindow = (orderId, razorOrder) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: razorOrder.amount,
+      currency: 'INR',
+      name: 'KhaoPio',
+      description: "Food Delivery Website",
+      order_id: razorOrder.id,
+      handler: async (response) => {
+        try {
+          const result = await axios.post(`${serverUrl}/api/order/verify-payment`, {
+            razorpay_payment_id: response.razorpay_payment_id,
+            orderId
+          }, { withCredentials: true })
+          dispatch(addMyOrder(result.data))
+          navigate('/order-placed')
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    }
+    const rzp = new window.Razorpay(options)
+    rzp.open()
+  }
 
   useEffect(() => {
     setAddressInput(address);
