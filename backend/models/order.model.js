@@ -79,6 +79,11 @@ const orderSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    status: {
+        type: String,
+        enum: ['created', 'paid', 'failed'],
+        default: 'created',
+    },
 }, { timestamps: true })
 
 const Order = mongoose.model("Order", orderSchema)
