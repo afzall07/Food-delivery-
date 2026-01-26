@@ -89,43 +89,77 @@ function CheckOut() {
         },
         { withCredentials: true }
       );
+      console.log("FULL RESPONSE:", result.data);
+
       if (paymentMethod == "cod") {
         dispatch(addMyOrder(result.data))
         navigate('/order-placed')
       } else {
         const orderId = result.data.orderId;
-        const razorOrder = result.data.razorOrder
-        handleRazorpayWindow(orderId, razorOrder)
+        const razorpayOrder = result.data.razorpayOrder;
+        handleRazorpayWindow(orderId, razorpayOrder);
       };
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleRazorpayWindow = (orderId, razorOrder) => {
+  const handleRazorpayWindow = (orderId, razorpayOrder) => {
+    if (!window.Razorpay) {
+      alert("Razorpay SDK not loaded");
+      return;
+    }
+
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: razorOrder.amount,
-      currency: 'INR',
-      name: 'KhaoPio',
+      amount: razorpayOrder.amount, // paise me
+      currency: "INR",
+      name: "KhaoPio",
       description: "Food Delivery Website",
-      order_id: razorOrder.id,
+      order_id: razorpayOrder.id,
+
       handler: async (response) => {
         try {
-          const result = await axios.post(`${serverUrl}/api/order/verify-payment`, {
-            razorpay_payment_id: response.razorpay_payment_id,
-            orderId
-          }, { withCredentials: true })
-          dispatch(addMyOrder(result.data))
-          navigate('/order-placed')
+          const result = await axios.post(
+            `${serverUrl}/api/order/verify-payment`,
+            {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              orderId,
+              amount: razorpayOrder.amount,
+            },
+            { withCredentials: true }
+          );
+
+          dispatch(addMyOrder(result.data));
+          console.log("ORDER PLACED:", result.data);
+          navigate("/order-placed");
+
         } catch (error) {
-          console.log(error)
+          console.error("VERIFY ERROR:", error);
+          alert(
+            error?.response?.data?.message ||
+            "Payment verification failed"
+          );
         }
-      }
-    }
-    const rzp = new window.Razorpay(options)
-    rzp.open()
-  }
+      },
+
+      modal: {
+        ondismiss: () => {
+          console.log("Payment popup closed");
+        },
+      },
+
+      theme: {
+        color: "#ff4d2d",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
 
   useEffect(() => {
     setAddressInput(address);
