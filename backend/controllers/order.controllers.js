@@ -6,8 +6,8 @@ import User from "../models/user.model.js"
 import { sendDeliveryOtpMail } from "../utils/mail.js"
 import Razorpay from 'razorpay'
 import dotenv from 'dotenv'
-dotenv.config()
-
+dotenv.config();
+import crypto from 'crypto'
 let instance = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -54,11 +54,21 @@ export const placeOrder = async (req, res) => {
         }));
 
         if (paymentMethod == "online") {
+            if (!totalAmount || totalAmount <= 0) {
+                return res.status(400).json({
+                    message: "Invalid total amount"
+                });
+            };
             const razorpayOrder = await instance.orders.create({
                 amount: Math.round(totalAmount * 100),
                 currency: 'INR',
                 receipt: `receipt_${Date.now()}`
             });
+            if (!razorpayOrder || !razorpayOrder.id) {
+                return res.status(500).json({
+                    message: "Failed to create Razorpay order"
+                });
+            }
             const newOrder = await Order.create({
                 user: req.userId,
                 paymentMethod,
@@ -93,26 +103,115 @@ export const placeOrder = async (req, res) => {
 
 export const verifyPayment = async (req, res) => {
     try {
-        const { razorpayOrderId, razorpayPaymentId } = req.body;
-        const razorpayOrder = await instance.orders.fetch(razorpayPaymentId);
-        if (razorpayOrder.status != "paid" || !razorpayOrder) {
-            return res.status(400).json({ message: "Payment not verified." });
-        };
-        const order = await Order.findById(razorpayOrderId)
-        if (!order) {
-            return res.status(404).json({ message: "order not found" })
-        };
+        const {
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature,
+            orderId,
+            amount,
+        } = req.body;
 
+        /* ===============================
+           1️⃣ BASIC VALIDATION
+        =============================== */
+        if (
+            !razorpay_order_id ||
+            !razorpay_payment_id ||
+            !razorpay_signature ||
+            !orderId
+        ) {
+            return res.status(400).json({ message: "Missing payment details" });
+        }
+
+        if (!process.env.RAZORPAY_KEY_SECRET) {
+            return res.status(500).json({
+                message: "Razorpay secret key not configured",
+            });
+        }
+
+        /* ===============================
+           2️⃣ SIGNATURE VERIFICATION
+        =============================== */
+        const body = `${razorpay_order_id}|${razorpay_payment_id}`;
+
+        const expectedSignature = crypto
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+            .update(body)
+            .digest("hex");
+
+        if (expectedSignature !== razorpay_signature) {
+            order.status = "failed";
+            await order.save();
+            return res.status(400).json({
+                message: "Invalid payment signature",
+            });
+        }
+
+        /* ===============================
+           3️⃣ ORDER FETCH
+        =============================== */
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        /* ===============================
+           4️⃣ DUPLICATE PAYMENT CHECK
+        =============================== */
+        if (order.payment === true) {
+            return res.status(400).json({
+                message: "Payment already verified for this order",
+            });
+        }
+
+        /* ===============================
+           5️⃣ AMOUNT VALIDATION 
+           Razorpay amount is always in paise
+        =============================== */
+        if (amount && order.totalAmount * 100 !== amount) {
+            order.status = "failed"; // 
+            await order.save();
+            return res.status(400).json({
+                message: "Payment amount mismatch",
+            });
+        }
+
+        /* ===============================
+           6️⃣ UPDATE ORDER
+        =============================== */
         order.payment = true;
-        order.razorpayPaymentId = razorpayPaymentId;
+        order.razorpayPaymentId = razorpay_payment_id;
+        order.razorpayOrderId = razorpay_order_id;
+        order.status = "paid";
+
         await order.save();
-        await order.populate("shopOrders.shopOrderItems.item", "name image price")
-        await order.populate("shopOrders.shop", "name")
-        return res.status(200).json(order);
+
+        /* ===============================
+           7️⃣ POPULATE (OPTIONAL)
+        =============================== */
+        await order.populate(
+            "shopOrders.shopOrderItems.item",
+            "name image price"
+        );
+        await order.populate("shopOrders.shop", "name");
+
+        return res.status(200).json({
+            success: true,
+            message: "Payment verified successfully",
+            order,
+        });
+
     } catch (error) {
-        return res.status(500).json({ message: `Payment verification error ${error}` });
+        console.error("VERIFY PAYMENT ERROR:", error);
+
+        return res.status(500).json({
+            message: "Payment verification error",
+            error: error.message,
+        });
     }
 };
+
 
 export const getMyOrders = async (req, res) => {
     if (!req.userId) {
