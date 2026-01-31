@@ -84,7 +84,7 @@ function CheckOut() {
             latitude: location.lat,
             longitude: location.long,
           },
-          totalAmount,
+          totalAmount: amountWithDeliveryFee,
           cartItems,
         },
         { withCredentials: true }
