@@ -243,7 +243,8 @@ export const getMyOrders = async (req, res) => {
                 user: order.user,
                 shopOrders: order.shopOrders.find(o => o.owner._id == req.userId),
                 createdAt: order.createdAt,
-                deliveryAddress: order.deliveryAddress
+                deliveryAddress: order.deliveryAddress,
+                payment: order.payment
             }))
             return res.status(200).json(filteredOrders)
         }
