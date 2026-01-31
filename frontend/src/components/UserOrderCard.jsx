@@ -21,8 +21,8 @@ function UserOrderCard({ data }) {
                     </p>
                 </div>
                 <div className='text-right'>
-                    <p className="text-sm text-gray-500">{data.paymentMethod?.toUpperCase()}</p>
-                    <p className="font-medium text-blue-600">{data.shopOrders?.[0].status}</p>
+                    {data.paymentMethod == "cod" ? <p className='text-gray-600'>Payment Mode: {data.paymentMethod?.toUpperCase()}</p> : <p className='text-gray-600 font-semibold'>Payment : {data.payment ? <span className='capitalize text-green-600'>paid</span> : <span className='capitalize text-[#ff4d2d]'>pending</span>}</p>}
+                    <p className="font-medium text-gray-600">Order Status: <span className='capitalize text-[#ff4d2d]'>{data.shopOrders?.[0].status}</span></p>
                 </div>
             </div>
             {data.shopOrders.map((shopOrder, i) => (
