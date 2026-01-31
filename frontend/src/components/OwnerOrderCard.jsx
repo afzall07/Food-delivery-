@@ -29,6 +29,7 @@ function OwnerOrderCard({ data }) {
         <span>{data.user.email}</span></p>
       <p className="flex items-center gap-2 text-gray-600 mt-1"><MdPhone size={20} />
         <span>{data.user.mobile}</span></p>
+      {data.paymentMethod == "online" ? <p className='text-gray-600'>Payment: {data.payment ? "paid" : "pending"}</p> : <p className='text-gray-600'>Payment Mode: {data.paymentMethod}</p>}
     </div>
       <div className="flex items-start flex-col gap-2 text-gray-600">
         <p className="flex items-center gap-2 text-gray-600"><FaMapMarkerAlt size={20} />
