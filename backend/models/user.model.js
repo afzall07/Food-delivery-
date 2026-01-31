@@ -21,6 +21,13 @@ const userSchema = new mongoose.Schema({
         enum: ["user", "owner", "deliveryBoy"],
         required: true
     },
+    socketId: {
+        type: String,
+    },
+    isOnline: {
+        type: Boolean,
+        default: false
+    },
     resetOtp: {
         type: String,
     },

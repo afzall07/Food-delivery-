@@ -1,4 +1,4 @@
- import React, { useEffect } from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setMyOrders } from "../redux/userSlice";
@@ -15,8 +15,8 @@ function useGetMyOrders() {
             withCredentials: true,
           }
         );
-          dispatch(setMyOrders(result.data));
-          console.log(result.data)
+        dispatch(setMyOrders(result.data));
+        // console.log(result.data)
       } catch (error) {
         console.log(error);
       }
