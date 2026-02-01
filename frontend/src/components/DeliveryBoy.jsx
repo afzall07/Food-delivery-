@@ -6,7 +6,7 @@ import { serverUrl } from "../App";
 import DeliveryBoyTracking from "./DeliveryBoyTracking";
 
 function DeliveryBoy() {
-  const { userData } = useSelector(state => state.user);
+  const { userData, socket } = useSelector(state => state.user);
   const [currentOrder, setCurrentOrder] = useState();
   const [availableAssignments, setAvailableAssignments] = useState(null)
   const [showOtpBox, setShowOtpBox] = useState(false)
@@ -24,6 +24,7 @@ function DeliveryBoy() {
     try {
       const result = await axios.get(`${serverUrl}/api/order/get-current-order`, { withCredentials: true })
       setCurrentOrder(result.data)
+      console.log(`currentOrder ${result.data}`)
     } catch (error) {
       console.log(`getCurrentOrder error ${error}`)
     }
@@ -63,6 +64,19 @@ function DeliveryBoy() {
     getCurrentOrder()
   }, [userData])
 
+  useEffect(() => {
+    socket?.on("newAssignment", (data) => {
+      if (data.sentTo == userData._id) {
+        setAvailableAssignments(prev => [...prev, data])
+      }
+    });
+
+    return () => {
+      socket?.off("newAssignment")
+    }
+  }, [socket])
+
+
   return (
     <div className="flex flex-col gap-5 items-center bg-[#fff9f6] overflow-y-auto">
       <Navbar />
@@ -80,7 +94,7 @@ function DeliveryBoy() {
                   <div>
                     <p className="text-sm font-semibold">{a?.shopName}</p>
                     <p className="text-sm text-gray-500"><span className="font-semibold">Delivery Address: </span>{a?.deliveryAddress.text}</p>
-                    <p className="text-xs text-gray-400">{a.items.length} items | {a.subTotal}</p>
+                    <p className="text-xs text-gray-400">{a.items.length} items | ₹{a.subTotal}</p>
                   </div>
                   <button className="bg-orange-500 text-white px-4 py-1 rounded-lg text-sm hover:bg-orange-600" onClick={() => acceptOrder(a.assignmentId)}>Accept</button>
 
