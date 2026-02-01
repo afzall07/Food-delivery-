@@ -13,7 +13,7 @@ export const sockethandler = async (io) => {
         });
         socket.on("disconnect", async () => {
             try {
-                const user = await User.findOneAndUpdate({ socketId: socket.id }, {
+                await User.findOneAndUpdate({ socketId: socket.id }, {
                     socketId: null, isOnline: false
                 }, { new: true })
             } catch (error) {
