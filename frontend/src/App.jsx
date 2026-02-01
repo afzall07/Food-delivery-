@@ -43,7 +43,7 @@ function App() {
 
     socketInstance.on("connect", () => {
       if (userData) {
-        socketInstance.emit('identify', { userId: userData._id })
+        socketInstance.emit('identity', { userId: userData._id })
       }
       console.log("✅ Socket connected")
     })
