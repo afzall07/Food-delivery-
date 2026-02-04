@@ -4,15 +4,22 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { serverUrl } from '../App'
 import { IoIosArrowRoundBack } from 'react-icons/io'
 import DeliveryBoyTracking from '../components/DeliveryBoyTracking'
+import { useSelector } from 'react-redux'
 
 function TrackOrderPage() {
     const { orderId } = useParams()
     const [currentOrder, setCurrentOrder] = useState()
     const navigate = useNavigate()
+    const { socket } = useSelector(state => state.user)
+    const [liveLocation, setLiveLocation] = useState({
+        latitude: null,
+        longitude: null
+    })
     const handleGetOrder = async () => {
         try {
             const result = await axios.get(`${serverUrl}/api/order/get-order-by-id/${orderId}`, { withCredentials: true })
             setCurrentOrder(result.data)
+            // console.log("currentOrder", currentOrder)
         } catch (error) {
             console.log(`handle get order error ${error}`)
         }
@@ -20,7 +27,20 @@ function TrackOrderPage() {
 
     useEffect(() => {
         handleGetOrder()
-    }, [orderId])
+    }, [orderId]);
+
+    useEffect(() => {
+        socket.on("updateDeliveryLocation", ({
+            deliveryBoyId,
+            latitude,
+            longitude
+        }) => {
+            setLiveLocation(prev => ({
+                ...prev,
+                [deliveryBoyId]: { lat: latitude, lon: longitude }
+            }))
+        })
+    }, [socket])
     return (
         <div className='max-w-4xl mx-auto p-4 flex flex-col gap-6'>
             <div className='relative top-[20px] left-[20px] z-[10] mb-[10px]' onClick={() => navigate(-1)}>
@@ -32,7 +52,10 @@ function TrackOrderPage() {
                     <div>
                         <p className='text-lg font-bold mb-2 text-[#ff4d2d]'>{shopOrder.shop.name}</p>
                         <p className='font-semibold'><span>Items: </span>{shopOrder.shopOrderItems?.map(i => i.name).join(",")}</p>
-                        <p><span className='font-semibold'>Subtotal: </span>₹{shopOrder.subTotal}</p>
+                        <p><span>Item Price: </span>₹{shopOrder.subTotal}</p>
+                        <p><span>Delivery charges: </span>₹50</p>
+                        <hr />
+                        <p><span className='font-semibold'>Total Amount: </span>₹{currentOrder.totalAmount}</p>
                         <p className='mt-6'><span className='font-semibold'>Delivery Address: </span>{currentOrder.deliveryAddress?.text}</p>
                     </div>
                     {shopOrder.status != "delivered" ? <>
@@ -43,7 +66,7 @@ function TrackOrderPage() {
                     </> : <p className='text-green-600 font-semibold text-lg'>Delivered</p>}
                     {(shopOrder.assignedDeliveryBoy && shopOrder.status !== "delivered") && <div className='h-[400px] w-full rounded-2xl overflow-hidden shadow-md'>
                         <DeliveryBoyTracking data={{
-                            deliveryBoyLocation: {
+                            deliveryBoyLocation: liveLocation[shopOrder.assignedDeliveryBoy._id] || {
                                 lat: shopOrder.assignedDeliveryBoy.location.coordinates[1],
                                 lon: shopOrder.assignedDeliveryBoy.location.coordinates[0],
                             },
