@@ -1,16 +1,33 @@
-import React from 'react'
+import axios from 'axios';
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { serverUrl } from '../App';
+import { FaStar } from 'react-icons/fa';
 
 function UserOrderCard({ data }) {
     const navigate = useNavigate()
+    const [selectedRating, setSelectedRating] = useState({}) //itemId:rating
     const formatDate = (dateString) => {
         const date = new Date(dateString)
         return date.toLocaleDateString('en-GB', {
             day: "2-digit",
             month: "short",
             year: "numeric"
-        })
+        });
+    };
+
+    const handleRating = async (itemId, rating) => {
+        try {
+            const result = await axios.post(`${serverUrl}/api/item/rating`, { itemId, rating }, { withCredentials: true })
+            setSelectedRating(prev => ({
+                ...prev,
+                [itemId]: rating
+            }))
+        } catch (error) {
+            console.log(error)
+        }
     }
+
     return (
         <div className='bg-white rounded-lg shadow p-4 space-y-4'>
             <div className="flex justify-between border-b pb-2">
@@ -33,6 +50,13 @@ function UserOrderCard({ data }) {
                                 <img src={item.item.image} alt="" className='w-full h-24 object-cover rounded' />
                                 <p className="text-sm font-semibold mt-1 text-center">{item.name}</p>
                                 <p className="text-xs text-gray-600">Qty: {item.quantity} x &#8377;{item.price}</p>
+
+                                {shopOrder.status == "delivered" && <div className='flex space-x-1 mt-2'>
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button key={star} className={`text-lg cursor-pointer ${selectedRating[item.item._id] >= star ? "text-yellow-500" : "text-gray-300"}`}
+                                            onClick={() => handleRating(item.item._id, star)}><FaStar /></button>
+                                    ))}
+                                </div>}
                             </div>
                         ))}
                     </div>
