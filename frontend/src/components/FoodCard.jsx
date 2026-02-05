@@ -69,7 +69,7 @@ function FoodCard({ data }) {
         </div>
         {/* price + cart  */}
         <div className="flex items-center justify-between mt-auto p-3">
-          <span className="font-bold text-gray-900 text-lg">{data.price}</span>
+          <span className="font-bold text-gray-900 text-lg">&#8377;{data.price}</span>
           <div className="flex items-center border rounded-full overflow-hidden shadow-sm">
             <button
               className="px-2 py-1 hover:bg-gray-100 transition"
@@ -85,24 +85,23 @@ function FoodCard({ data }) {
               <FaPlus size={12} />
             </button>
             <button
-              className={`${
-                cartItems.some((item) => item.id == data._id)
+              className={`${cartItems.some((item) => item.id == data._id)
                   ? "bg-gray-800"
                   : "bg-[#ff4d2d]"
-              } text-white px-3 py-2 transition-colors cursor-pointer`}
+                } text-white px-3 py-2 transition-colors cursor-pointer`}
               onClick={() => {
                 quantity > 0
                   ? dispatch(
-                      addToCart({
-                        id: data._id,
-                        name: data.name,
-                        price: data.price,
-                        image: data.image,
-                        shop: data.shop,
-                        quantity,
-                        foodType: data.foodType,
-                      })
-                    )
+                    addToCart({
+                      id: data._id,
+                      name: data.name,
+                      price: data.price,
+                      image: data.image,
+                      shop: data.shop,
+                      quantity,
+                      foodType: data.foodType,
+                    })
+                  )
                   : null;
               }}
             >
