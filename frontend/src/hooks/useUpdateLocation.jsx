@@ -30,7 +30,7 @@ function useUpdateLocation() {
         const updateLocation = async (lat, long) => {
             try {
                 const result = await axios.post(`${serverUrl}/api/user/update-location`, { lat, long }, { withCredentials: true });
-                console.log("Location update success:", result.data);
+                // console.log("Location update success:", result.data);
             } catch (error) {
                 const status = error.response ? error.response.status : 'N/A';
                 const message = error.response ? error.response.data : error.message;
