@@ -13,7 +13,7 @@ import { serverUrl } from "../App";
 import { useEffect } from "react";
 
 function Navbar() {
-  const { userData, currentCity, cartItems } = useSelector(
+  const { userData, currentCity, cartItems, myOrders } = useSelector(
     (state) => state.user
   );
   const { shopData } = useSelector((state) => state.owner);
@@ -155,7 +155,7 @@ function Navbar() {
                 Pending Orders
               </span>
               <span className="absolute -right-2 -top-2 text-[10px] sm:text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[5px] py-[1px]">
-                0
+                {myOrders?.filter(order => order.status == "pending").length}
               </span>
             </div>
             <div className="md:hidden relative text-[#ff4d2d]" onClick={() => navigate("/my-orders")}>
