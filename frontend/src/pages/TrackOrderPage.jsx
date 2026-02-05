@@ -66,10 +66,12 @@ function TrackOrderPage() {
                     </> : <p className='text-green-600 font-semibold text-lg'>Delivered</p>}
                     {(shopOrder.assignedDeliveryBoy && shopOrder.status !== "delivered") && <div className='h-[400px] w-full rounded-2xl overflow-hidden shadow-md'>
                         <DeliveryBoyTracking data={{
-                            deliveryBoyLocation: liveLocation[shopOrder.assignedDeliveryBoy._id] || {
-                                lat: shopOrder.assignedDeliveryBoy.location.coordinates[1],
-                                lon: shopOrder.assignedDeliveryBoy.location.coordinates[0],
-                            },
+                            deliveryBoyLocation: (liveLocation[shopOrder.assignedDeliveryBoy._id]?.lat && liveLocation[shopOrder.assignedDeliveryBoy._id]?.lon)
+                                ? liveLocation[shopOrder.assignedDeliveryBoy._id]
+                                : {
+                                    lat: shopOrder.assignedDeliveryBoy.location.coordinates[1],
+                                    lon: shopOrder.assignedDeliveryBoy.location.coordinates[0],
+                                },
                             customerLocation: {
                                 lat: currentOrder.deliveryAddress.latitude,
                                 lon: currentOrder.deliveryAddress.longitude,
