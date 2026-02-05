@@ -18,10 +18,18 @@ const customerIcon = new L.Icon({
 
 function DeliveryBoyTracking({ data }) {
 
-    const deliveryBoyLat = data.deliveryBoyLocation.lat
-    const deliveryBoyLon = data.deliveryBoyLocation.lon
-    const customerlat = data.customerLocation.lat
-    const customerlon = data.customerLocation.lon
+    const deliveryBoyLat = data?.deliveryBoyLocation?.lat
+    const deliveryBoyLon = data?.deliveryBoyLocation?.lon
+    const customerlat = data?.customerLocation?.lat
+    const customerlon = data?.customerLocation?.lon
+
+    if (!deliveryBoyLat || !deliveryBoyLon || !customerlat || !customerlon) {
+        return (
+            <div className='w-full h-[400px] mt-3 rounded-xl overflow-hidden shadow-md bg-gray-100 flex items-center justify-center'>
+                <p className='text-gray-500 animate-pulse'>Loading Map...</p>
+            </div>
+        )
+    }
 
     const path = [
         [deliveryBoyLat, deliveryBoyLon],
