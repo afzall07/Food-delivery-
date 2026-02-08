@@ -24,7 +24,7 @@ import Shop from "./pages/Shop";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { setSocket } from "./redux/userSlice";
-export const serverUrl = "http://localhost:7000"
+export const serverUrl = "https://khaopio-backend.onrender.com"
 
 function App() {
   const { userData } = useSelector((state) => state.user);
