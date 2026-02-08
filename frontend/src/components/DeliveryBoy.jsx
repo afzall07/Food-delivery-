@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { serverUrl } from "../App";
 import DeliveryBoyTracking from "./DeliveryBoyTracking";
+import { OrderCardSkeleton } from "./SpecificSkeletons";
 import { Bar, BarChart, CartesianGrid, Label, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ClipLoader } from "react-spinners";
 
@@ -170,7 +171,9 @@ function DeliveryBoy() {
         {!currentOrder && <div className="bg-white rounded-2xl p-5 shadow-md w-[90%] border border-orange-100">
           <h1 className="text-lg font-bold mb-4 flex items-center gap-2">Available Orders</h1>
           <div className="space-y-4">
-            {availableAssignments?.length > 0 ? (
+            {isLoading ? (
+              [...Array(2)].map((_, i) => <OrderCardSkeleton key={i} />)
+            ) : availableAssignments?.length > 0 ? (
               availableAssignments.map((a, i) => (
                 <div className="border rounded-lg p-4 flex justify-between items-center" key={i}>
                   <div>
@@ -190,11 +193,15 @@ function DeliveryBoy() {
         {currentOrder &&
           <div className="bg-white rounded-2xl p-5 shadow-md w-[90%] border border-orange-100 z-10">
             <h2 className="text-lg font-bold mb-3">📦 Current Order</h2>
-            <div className="border rounded-lg p-4 mb-3">
-              <p className="font-semibold text-sm">{currentOrder?.shopOrder.shop.name}</p>
-              <p className="text-sm text-gray-500">{currentOrder.deliveryAddress.text}</p>
-              <p className="text-xs text-gray-400">{currentOrder.shopOrder.shopOrderItems.length} items | ₹{currentOrder.shopOrder.subTotal}</p>
-            </div>
+            {isLoading ? (
+              <OrderCardSkeleton />
+            ) : (
+              <div className="border rounded-lg p-4 mb-3">
+                <p className="font-semibold text-sm">{currentOrder?.shopOrder.shop.name}</p>
+                <p className="text-sm text-gray-500">{currentOrder.deliveryAddress.text}</p>
+                <p className="text-xs text-gray-400">{currentOrder.shopOrder.shopOrderItems.length} items | ₹{currentOrder.shopOrder.subTotal}</p>
+              </div>
+            )}
             <DeliveryBoyTracking data={{
               deliveryBoyLocation: (deliveryBoyLocation.lat && deliveryBoyLocation.lon) ? deliveryBoyLocation : {
                 lat: userData.location.coordinates[1],
