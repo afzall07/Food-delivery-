@@ -5,6 +5,7 @@ import {
   setShopsInMyCity,
   setUserData,
   setItemsInMyCity,
+  setLoading,
 } from "../redux/userSlice";
 
 function useGetItemsByCity() {
@@ -16,17 +17,16 @@ function useGetItemsByCity() {
         return;
       }
       try {
+        dispatch(setLoading({ key: 'items', value: true }));
         const result = await axios.get(
           `http://localhost:7000/api/item/get-by-city/${currentCity}`,
           { withCredentials: true }
         );
-        // const itemsArray = Array.isArray(result.data)
-        //   ? result.data
-        //   : [result.data];
         dispatch(setItemsInMyCity(result.data));
-        // console.log("API Result:", itemsArray);
       } catch (error) {
         console.log(error);
+      } finally {
+        dispatch(setLoading({ key: 'items', value: false }));
       }
     };
     fetchItems();
