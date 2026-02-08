@@ -5,10 +5,12 @@ import { serverUrl } from '../App'
 import { IoIosArrowRoundBack } from 'react-icons/io'
 import DeliveryBoyTracking from '../components/DeliveryBoyTracking'
 import { useSelector } from 'react-redux'
+import { OrderCardSkeleton } from '../components/SpecificSkeletons'
 
 function TrackOrderPage() {
     const { orderId } = useParams()
     const [currentOrder, setCurrentOrder] = useState()
+    const [loading, setLoading] = useState(true)
     const navigate = useNavigate()
     const { socket } = useSelector(state => state.user)
     const [liveLocation, setLiveLocation] = useState({
@@ -17,11 +19,14 @@ function TrackOrderPage() {
     })
     const handleGetOrder = async () => {
         try {
+            setLoading(true)
             const result = await axios.get(`${serverUrl}/api/order/get-order-by-id/${orderId}`, { withCredentials: true })
             setCurrentOrder(result.data)
             // console.log("currentOrder", currentOrder)
         } catch (error) {
             console.log(`handle get order error ${error}`)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -47,7 +52,11 @@ function TrackOrderPage() {
                 <IoIosArrowRoundBack size={35} className='text-[#ff4d2d] cursor-pointer' />
                 <h1 className='text-2xl font-bold md:text-center'>Track Order</h1>
             </div>
-            {currentOrder?.shopOrders?.map((shopOrder, i) => (
+            {loading ? (
+                <div className='space-y-6'>
+                    {[...Array(2)].map((_, i) => <OrderCardSkeleton key={i} />)}
+                </div>
+            ) : currentOrder?.shopOrders?.map((shopOrder, i) => (
                 <div className='bg-white p-4 rounded-2xl shadow-md border border-orange-100 space-y-4' key={i}>
                     <div>
                         <p className='text-lg font-bold mb-2 text-[#ff4d2d]'>{shopOrder.shop.name}</p>
