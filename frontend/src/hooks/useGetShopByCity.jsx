@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setShopsInMyCity, setUserData } from "../redux/userSlice";
+import { setShopsInMyCity, setLoading } from "../redux/userSlice";
 
 function useGetShopByCity() {
   const dispatch = useDispatch();
@@ -12,6 +12,7 @@ function useGetShopByCity() {
         return;
       }
       try {
+        dispatch(setLoading({ key: 'shops', value: true }));
         const result = await axios.get(
           `http://localhost:7000/api/shop/get-by-city/${currentCity}`,
           { withCredentials: true }
@@ -24,7 +25,10 @@ function useGetShopByCity() {
         // console.log("API Result:", shopsArray);
       } catch (error) {
         console.log(error);
+      } finally {
+        dispatch(setLoading({ key: 'shops', value: false }));
       }
+
     };
     fetchShop();
   }, [currentCity, dispatch]);
