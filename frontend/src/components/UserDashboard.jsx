@@ -5,6 +5,7 @@ import CategoryCard from "./CategoryCard";
 import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import FoodCard from "./FoodCard";
+import { CategoryCardSkeleton, FoodCardSkeleton, ShopCardSkeleton } from "./SpecificSkeletons";
 import { useNavigate } from "react-router-dom";
 
 function UserDashboard() {
@@ -17,7 +18,7 @@ function UserDashboard() {
   const [shopLeftScrollButton, setShopLeftScrollButton] = useState(false);
   const [shopRightScrollButton, setShopRightScrollButton] = useState(false);
   const [updatedItemsList, setUpdatedItemsList] = useState([]);
-  const { currentCity, shopsInMyCity, itemsInMyCity, searchItems } = useSelector(
+  const { currentCity, shopsInMyCity, itemsInMyCity, searchItems, loading } = useSelector(
     (state) => state.user
   );
   const navigate = useNavigate()
@@ -163,7 +164,9 @@ function UserDashboard() {
             className="w-full flex overflow-x-auto gap-4 pb-2 no-scrollbar"
             ref={shopScrollRef}
           >
-            {shopsInMyCity?.length > 0 ? (
+            {loading?.shops ? (
+              [...Array(5)].map((_, i) => <ShopCardSkeleton key={i} />)
+            ) : shopsInMyCity?.length > 0 ? (
               shopsInMyCity.map((shop, index) => (
                 <CategoryCard key={index} name={shop.name} image={shop.image} onClick={() => navigate(`/shop/${shop._id}`)} />
               ))
@@ -189,7 +192,9 @@ function UserDashboard() {
           Suggested Food Items
         </h1>
         <div className="w-full h-auto flex flex-wrap gap-[20px] justify-center">
-          {updatedItemsList?.map((item, index) => (
+          {loading?.items ? (
+            [...Array(8)].map((_, i) => <FoodCardSkeleton key={i} />)
+          ) : updatedItemsList?.map((item, index) => (
             <FoodCard data={item} key={index} />
           ))}
         </div>
