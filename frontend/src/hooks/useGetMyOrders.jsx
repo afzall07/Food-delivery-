@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setMyOrders } from "../redux/userSlice";
+import { setMyOrders, setLoading } from "../redux/userSlice";
 
 function useGetMyOrders() {
   const dispatch = useDispatch();
@@ -9,6 +9,7 @@ function useGetMyOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
+        dispatch(setLoading({ key: 'orders', value: true }));
         const result = await axios.get(
           "http://localhost:7000/api/order/my-orders",
           {
@@ -16,9 +17,10 @@ function useGetMyOrders() {
           }
         );
         dispatch(setMyOrders(result.data));
-        // console.log(result.data)
       } catch (error) {
         console.log(error);
+      } finally {
+        dispatch(setLoading({ key: 'orders', value: false }));
       }
     };
     fetchOrders();
