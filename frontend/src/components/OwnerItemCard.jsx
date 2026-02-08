@@ -4,6 +4,7 @@ import { FaPen, FaTrashAlt } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setShopData } from "../redux/ownerSlice";
+import { serverUrl } from "../App";
 
 function OwnerItemCard({ data }) {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ function OwnerItemCard({ data }) {
   const handleDelete = async () => {
     try {
       const result = await axios.get(
-        `http://localhost:7000/api/item/delete/${data._id}`,
+        `${serverUrl}/api/item/delete/${data._id}`,
         { withCredentials: true }
       );
       dispatch(setShopData(result.data));

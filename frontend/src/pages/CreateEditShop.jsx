@@ -6,6 +6,7 @@ import { FaUtensils } from "react-icons/fa";
 import { setShopData } from "../redux/ownerSlice.js";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
+import { serverUrl } from "../App.jsx";
 
 function CreateEditShop() {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ function CreateEditShop() {
         formData.append("image", backendImage);
       }
       const result = await axios.post(
-        "http://localhost:7000/api/shop/create-edit",
+        `${serverUrl}/api/shop/create-edit`,
         formData,
         { withCredentials: true }
       );

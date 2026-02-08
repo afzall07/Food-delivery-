@@ -4,6 +4,7 @@ import { IoArrowBack } from "react-icons/io5";
 import { data, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
+import { serverUrl } from "../App";
 
 function ForgotPassword() {
   const [step, setStep] = useState(1);
@@ -24,7 +25,7 @@ function ForgotPassword() {
     setLoading(true);
     try {
       const result = await axios.post(
-        "http://localhost:7000/api/auth/send-otp",
+        `${serverUrl}/api/auth/send-otp`,
         {
           email,
         },

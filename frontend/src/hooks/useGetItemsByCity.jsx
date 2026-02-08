@@ -7,6 +7,7 @@ import {
   setItemsInMyCity,
   setLoading,
 } from "../redux/userSlice";
+import { serverUrl } from "../App";
 
 function useGetItemsByCity() {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ function useGetItemsByCity() {
       try {
         dispatch(setLoading({ key: 'items', value: true }));
         const result = await axios.get(
-          `http://localhost:7000/api/item/get-by-city/${currentCity}`,
+          `${serverUrl}/api/item/get-by-city/${currentCity}`,
           { withCredentials: true }
         );
         dispatch(setItemsInMyCity(result.data));

@@ -6,6 +6,7 @@ import { FaUtensils } from "react-icons/fa";
 import { setShopData } from "../redux/ownerSlice.js";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
+import { serverUrl } from "../App.jsx";
 
 function AddItem() {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ function AddItem() {
         formData.append("foodType", foodType);
       }
       const result = await axios.post(
-        "http://localhost:7000/api/item/add-item",
+        `${serverUrl}/api/item/add-item`,
         formData,
         { withCredentials: true }
       );

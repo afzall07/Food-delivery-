@@ -10,6 +10,7 @@ import { auth } from "../../firbase";
 import { ClipLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
+import { serverUrl } from "../App";
 
 function SignUp() {
   const primaryColor = "#ff4d2d";
@@ -82,7 +83,7 @@ function SignUp() {
     try {
       // API call
       const result = await axios.post(
-        "http://localhost:7000/api/auth/signup",
+        `${serverUrl}/api/auth/signup`,
         {
           fullName: fullName.trim(),
           email: email.trim(),
@@ -115,7 +116,7 @@ function SignUp() {
     const result = await signInWithPopup(auth, provider);
     try {
       const { data } = await axios.post(
-        "http://localhost:7000/api/auth/google-auth",
+        `${serverUrl}/api/auth/google-auth`,
         {
           fullName: result.user.displayName,
           email: result.user.email,
@@ -271,9 +272,9 @@ function SignUp() {
                   role == r
                     ? { backgroundColor: primaryColor, color: "white" }
                     : {
-                        border: `1px solid ${primaryColor}`,
-                        color: primaryColor,
-                      }
+                      border: `1px solid ${primaryColor}`,
+                      color: primaryColor,
+                    }
                 }
               >
                 {r}

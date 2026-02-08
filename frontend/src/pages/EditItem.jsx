@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FaUtensils } from "react-icons/fa";
 import { setShopData } from "../redux/ownerSlice.js";
 import axios from "axios";
+import { serverUrl } from "../App.jsx";
 
 function EditItem() {
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ function EditItem() {
         formData.append("image", backendImage);
       }
       const result = await axios.post(
-        `http://localhost:7000/api/item/edit-item/${itemId}`,
+        `${serverUrl}/api/item/edit-item/${itemId}`,
         formData,
         { withCredentials: true }
       );

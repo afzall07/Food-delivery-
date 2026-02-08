@@ -10,6 +10,7 @@ import { auth } from "../../firbase.js";
 import { ClipLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice.js";
+import { serverUrl } from "../App.jsx";
 
 function SignIn() {
   const primaryColor = "#ff4d2d";
@@ -36,7 +37,7 @@ function SignIn() {
     try {
       // API call
       const result = await axios.post(
-        "http://localhost:7000/api/auth/signin",
+        `${serverUrl}/api/auth/signin`,
         {
           email,
           password,
@@ -59,7 +60,7 @@ function SignIn() {
     const result = await signInWithPopup(auth, provider);
     try {
       const { data } = await axios.post(
-        "http://localhost:7000/api/auth/google-auth",
+        `${serverUrl}/api/auth/google-auth`,
         {
           email: result.user.email,
         },

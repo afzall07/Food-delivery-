@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setMyOrders, setLoading } from "../redux/userSlice";
+import { serverUrl } from "../App";
 
 function useGetMyOrders() {
   const dispatch = useDispatch();
@@ -11,7 +12,7 @@ function useGetMyOrders() {
       try {
         dispatch(setLoading({ key: 'orders', value: true }));
         const result = await axios.get(
-          "http://localhost:7000/api/order/my-orders",
+          `${serverUrl}/api/order/my-orders`,
           {
             withCredentials: true,
           }
