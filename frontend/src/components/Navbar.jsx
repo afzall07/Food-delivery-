@@ -155,13 +155,13 @@ function Navbar() {
                 Pending Orders
               </span>
               <span className="absolute -right-2 -top-2 text-[10px] sm:text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[5px] py-[1px]">
-                {myOrders?.filter(order => order.status == "pending").length}
+                {myOrders?.filter(order => order.shopOrders?.status == "pending").length}
               </span>
             </div>
             <div className="md:hidden relative text-[#ff4d2d]" onClick={() => navigate("/my-orders")}>
               <MdPendingActions className="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer" />
               <span className="absolute -right-2 -top-2 text-[10px] sm:text-xs font-bold text-white bg-[#ff4d2d] rounded-full px-[5px] py-[1px]">
-                0
+                {myOrders?.filter(order => order.shopOrders?.status == "pending").length}
               </span>
             </div>
           </>
