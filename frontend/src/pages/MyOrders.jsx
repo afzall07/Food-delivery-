@@ -6,8 +6,9 @@ import UserOrderCard from '../components/UserOrderCard';
 import OwnerOrderCard from '../components/OwnerOrderCard';
 import { useEffect } from 'react';
 import { setMyOrders, updateRealTimeOrderStatus } from '../redux/userSlice';
+import { OrderCardSkeleton } from '../components/SpecificSkeletons';
 function MyOrders() {
-    const { userData, myOrders, socket } = useSelector(state => state.user)
+    const { userData, myOrders, socket, loading } = useSelector(state => state.user)
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
@@ -41,15 +42,20 @@ function MyOrders() {
                     <h1 className="text-2xl font-bold text-start">My Orders</h1>
                 </div>
                 <div className="space-y-6">
-                    {myOrders?.map((order, index) => (
-                        userData.role == "user" ? (
-                            <UserOrderCard data={order} key={index} />
-
-                        ) :
-                            userData.role == "owner" ? (
-                                <OwnerOrderCard data={order} key={index} />
-                            ) : null
-                    ))}
+                    {loading?.orders ? (
+                        [...Array(3)].map((_, i) => <OrderCardSkeleton key={i} />)
+                    ) : myOrders?.length > 0 ? (
+                        myOrders.map((order, index) => (
+                            userData.role == "user" ? (
+                                <UserOrderCard data={order} key={index} />
+                            ) :
+                                userData.role == "owner" ? (
+                                    <OwnerOrderCard data={order} key={index} />
+                                ) : null
+                        ))
+                    ) : (
+                        <p className="text-center text-gray-500">No orders found.</p>
+                    )}
                 </div>
             </div>
         </div>
